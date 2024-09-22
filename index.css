@@ -1,0 +1,229 @@
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f7f7f7;
+    margin: 0;
+    padding: 0;
+    color: #333;
+}
+
+.navbar {
+    background-color: #007bff; /* 蓝色 */
+    overflow: hidden;
+    position: relative; /* 确保下拉框基于navbar定位 */
+}
+
+.navbar a {
+    float: left;
+    display: block;
+    color: #ffffff;
+    text-align: center;
+    padding: 14px 20px;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.navbar a:hover {
+    background-color: #0056b3; /* 深蓝色 */
+}
+
+.navbar .login-btn {
+    float: right;
+}
+
+.avatar {
+    height: 40px; /* 自定义头像高度 */
+    width: 40px; /* 自定义头像宽度 */
+    border-radius: 50%; /* 圆形头像 */
+    cursor: pointer; /* 指针样式 */
+    float: right; /* 右对齐 */
+    margin-right: 10px; /* 右侧间距 */
+    z-index: 2; /* 确保头像在较高层级 */
+    position: relative; /* 使用相对定位 */
+}
+
+.dropdown {
+    display: none; /* 初始隐藏 */
+    position: absolute;
+    right: 10px; /* 下拉菜单右对齐 */
+    top: 50px; /* 调整为头像的下方 */
+    background-color: white;
+    border: 1px solid #ccc;
+    width: 150px; /* 设置下拉菜单的宽度 */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); /* 添加阴影效果 */
+    z-index: 1000; /* 确保下拉菜单位于最上层 */
+}
+
+.dropdown-menu {
+    padding: 8px;
+}
+
+.dropdown-menu a {
+    color: black; 
+    text-decoration: none; 
+    display: block;
+    padding: 4px 8px; 
+}
+
+.dropdown-menu a:hover {
+    background-color: #f0f0f0; 
+}
+
+h1 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+}
+
+.image-container {
+    position: relative;
+    margin: 20px 0; /* 在标题和图片之间增加间距 */
+}
+
+.image-container img {
+    max-width: 100%; /* 限制图片宽度以适应容器 */
+    height: auto; /* 自适应高度 */
+    border-radius: 8px; /* 圆角 */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.subtitle {
+    position: absolute;
+    top: 40%; /* Move the subtitle up */
+    left: 50%; /* Center horizontally */
+    transform: translate(-50%, -50%); /* Centering */
+    color: white; /* Set text color to white */
+    font-size: 9rem; /* Keep font size */
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7); /* Adding shadow for better visibility */
+    text-align: center; /* Center align text */
+}
+
+.software-download {
+    position: absolute;
+    top: 75%; /* 将按钮下移 */
+    left: 50%; /* 水平居中 */
+    transform: translate(-50%, -50%); /* 中心对齐 */
+    padding: 12px 0; /* 垂直内边距 */
+    background-color: #007bff; /* 按钮背景色 */
+    color: #ffffff; /* 文字颜色 */
+    text-decoration: none; /* 移除下划线 */
+    border-radius: 32px; /* 圆角 */
+    transition: background-color 0.3s, box-shadow 0.3s; /* 过渡效果 */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* 阴影效果 */
+    font-size: 1.2rem; /* 字体大小 */
+    display: flex; /* 使用 flexbox 对齐 */
+    align-items: center; /* 垂直居中 */
+    justify-content: center; /* 水平居中对齐文本和图标 */
+    width: 350px; /* 设置按钮宽度 */
+    text-align: center; /* 水平居中对齐文本 */
+    line-height: 36px; /* 行高 */
+    box-sizing: border-box; /* 包括内边距在宽度和高度内 */
+}
+
+.software-download:hover {
+    background-color: #0056b3; /* 悬停效果 */
+}
+
+.download-icon {
+    width: 80px; /* 图标宽度 */
+    height: auto; /* 高度自适应 */
+    margin-right: 8px; /* 图标与文本之间的间距 */
+}
+
+/* 内容区域整体布局 */
+.content-container {
+    display: flex; /* 使用 flex布局 */
+    max-width: 1200px; /* 限制整体宽度 */
+    margin: 20px auto; /* 居中 */
+}
+
+/* 软件介绍部分样式 */
+.introduction-container {
+    max-width: 50%; /* 限制介绍部分的最大宽度 */
+    margin: 0; /* 去除上下边距 */
+    text-align: left; /* 文字左对齐 */
+}
+
+.software-title {
+    font-size: 4.5rem; /* 标题大小 */
+    color: black; /* 标题颜色 */
+    margin: 20px 0; /* 上下间距 */
+}
+
+.software-description {
+    font-size: 2.25rem; /* 字体大小为软件介绍标题的一半 */
+    line-height: 1.6; /* 行高 */
+    color: #333; /* 文字颜色 */
+    margin: 10px 0; /* 上下间距 */
+}
+
+/* 侧边图片样式 */
+.image-sidebar {
+    margin-left: 20px; /* 左侧空隙 */
+}
+
+.sidebar-image {
+    max-width: 600px; /* 增加侧边图片的最大宽度为原来的两倍 */
+    height: auto; /* 自适应高度 */
+    border-radius: 8px; /* 圆角 */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 阴影效果 */
+}
+
+/* 新增使用教程部分样式 */
+.tutorial-container {
+    margin: 20px auto; /* 添加上下间距 */
+    max-width: 800px; /* 设置最大宽度 */
+    text-align: center; /* 使文字居中 */
+    transform: scale(1); /* 整体缩放到75% */
+    transform-origin: top center; /* 设置缩放原点为顶部中心 */
+}
+
+/* 将教程列表设为flex布局 */
+.tutorial-list {
+    list-style-type: none; /* 去掉默认的样式 */
+    padding-left: 0; /* 去掉左侧内边距 */
+    display: flex; /* 设置为flex布局 */
+    flex-direction: column; /* 竖向排列 */
+    align-items: center; /* 水平居中 */
+}
+
+/* 列表项样式 */
+.tutorial-list li {
+    font-size: 1.5rem; /* 列表项字体大小 */
+    margin: 10px 0; /* 添加上下间距 */
+    width: 100%; /* 设置最宽为100%以便子元素居中 */
+    text-align: left; /* 文字左对齐，可根据需求调整 */
+    max-width: 600px; /* 可根据实际需求限制每个步骤的最大宽度 */
+}
+
+/* 调整使用教程部分的图片样式以确保其始终为75% */
+.tutorial-image {
+    display: block; /* 确保是块级元素 */
+    width: 75%; /* 设置图片宽度为75% */
+    max-width: 800px; /* 限制最大宽度（可选） */
+    height: auto; /* 高度自适应 */
+    margin: 10px auto; /* 添加上下间距，并水平居中 */
+    border-radius: 4px; /* 图片圆角 */
+}
+
+/* 针对first.png的样式 */
+.first-image {
+    display: block; /* 确保是块级元素 */
+    width: 100%; /* 图片宽度为100% */
+    height: auto; /* 高度自适应 */
+    margin: 10px auto; /* 添加上下间距，并水平居中 */
+    border-radius: 4px; /* 图片圆角 */
+}
+
+/* 新增版权信息部分样式 */
+.footer {
+    background-color: #f1f1f1;
+    padding: 20px;
+    text-align: center;
+    position: relative;
+    bottom: 0;
+    width: 100%;
+}
+
+.footer p {
+    margin: 0;
+    color: #666; /* 版权信息颜色 */
+}

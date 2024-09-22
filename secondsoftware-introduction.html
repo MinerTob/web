@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>软件介绍 - 父母性别查询器</title>
+    <link rel="stylesheet" href="index.css">
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh; /* 让页面高度至少为视口高度 */
+        }
+
+        .content-container {
+            flex: 1; /* 占据可用空间 */
+        }
+
+        .footer {
+            background-color: #f1f1f1; /* 背景颜色 */
+            padding: 20px;
+            text-align: center;
+        }
+
+        /* 导航栏的样式保持一致 */
+        .navbar {
+            background-color: #007bff; /* 蓝色 */
+            padding: 10px; /* 添加顶部内边距 */
+            z-index: 10; /* 设置z-index */
+            position: relative; /* 使下拉菜单相对位置 */
+            display: flex; /* 使用flex布局 */
+            align-items: center; /* 垂直居中对齐 */
+        }
+
+        .nav-links {
+            display: flex; /* 使用flex布局 */
+            align-items: center; /* 垂直居中对齐 */
+            margin-right: auto; /* 将链接部分推到左边 */
+        }
+
+        .welcome-message {
+            color: white; /* 欢迎信息颜色 */
+            font-size: 1.1rem; /* 欢迎信息字体大小 */
+            margin-right: 5px; /* 和头像的间距 */
+        }
+
+        .avatar {
+            height: 40px; /* 自定义头像高度 */
+            width: 40px; /* 自定义头像宽度 */
+            border-radius: 50%; /* 圆形头像 */
+            cursor: pointer; /* 指针样式 */
+            margin-left: 10px; /* 左侧间距 */
+        }
+
+        .dropdown {
+            display: none; /* 初始隐藏 */
+            position: fixed; /* 固定定位 */
+            right: 10px; /* 下拉菜单右对齐 */
+            top: 60px; /* 调整为头像的下方 */
+            background-color: white;
+            border: 1px solid #ccc;
+            width: 150px; /* 设置下拉菜单的宽度 */
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); /* 添加阴影效果 */
+            z-index: 20; /* 确保下拉菜单位于最上层 */
+        }
+
+        .dropdown-menu {
+            padding: 8px;
+        }
+
+        .dropdown-menu a {
+            color: black; 
+            text-decoration: none; 
+            display: block;
+            padding: 4px 8px; 
+        }
+
+        .dropdown-menu a:hover {
+            background-color: #f0f0f0; 
+        }
+    </style>
+</head>
+<body>
+
+    <div class="navbar">
+        <div class="nav-links">
+            <a href="secondindex.html" class="second-index-btn">首页</a>
+            <a href="secondsoftware-introduction.html" class="second-index-btn">软件介绍</a>
+            <a href="secondusage-method.html" class="second-index-btn">使用方法</a>
+            <a class="about-link" href="https://username-github-io.onrender.com/" target="_blank">关于作者（矿工Tob）</a>
+        </div>
+
+        <!-- 欢迎信息 -->
+        <span class="welcome-message" id="welcomeMessage">欢迎您，用户！</span>
+        
+        <!-- 头像 -->
+        <img src="images/man.png" alt="Avatar" class="avatar" id="avatar">
+        <div class="dropdown" id="dropdown">
+            <div class="dropdown-menu">
+                <a href="resetPassword.html">重置密码</a>
+                <a href="login.html">切换账号</a>
+                <a href="#" id="logout">退出登录</a>
+            </div>
+        </div>
+    </div>
+
+    <h1 style="text-align: center;">软件介绍</h1>
+    <div class="content-container">
+        <div class="introduction-container">
+            <h2 class="software-title">软件介绍</h2>
+            <p class="software-description">父母性别查询器是一款由矿工Tob独立开发的神金软件，您可以轻松查询您父母的性别（虽然并没有什么实际意义）。父母性别查询器支持多种语言（目前有九种），让世界各地的欢愉信徒能够轻松使用。</p>
+        </div>
+        <div class="image-sidebar">
+            <img src="images/fmxbcxq.png" alt="Image Description" class="sidebar-image">
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>&copy; 2024 父母性别查询器</p>
+    </div>
+
+    <script>
+        // 获取存储的邮箱信息并更新欢迎信息
+        const rememberedEmail = localStorage.getItem('rememberedEmail') || '用户';
+        document.getElementById('welcomeMessage').textContent = '欢迎您，' + rememberedEmail + '！';
+        
+        // 头像点击事件
+        document.getElementById('avatar').addEventListener('click', function(event) {
+            event.stopPropagation(); // 阻止事件冒泡
+            const dropdown = document.getElementById('dropdown');
+            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+        });
+
+        // 退出登录事件
+        document.getElementById('logout').addEventListener('click', function() {
+            localStorage.setItem('isLoggedIn', 'false'); // 设置登录状态为未登录
+            window.location.href = 'index.html'; // 返回首页
+        });
+
+        // 点击其他区域隐藏下拉框
+        window.onclick = function(event) {
+            if (!event.target.matches('#avatar')) {
+                const dropdown = document.getElementById("dropdown");
+                dropdown.style.display = "none";
+            }
+        }
+    </script>
+</body>
+</html>
+<!-- 
+       　  　▃▆█▇▄▖
+　 　 　 ▟◤▖　　　◥█▎
+   　 ◢◤　 ▐　　　 　▐▉
+　 ▗◤　　　▂　▗▖　　▕█▎
+　◤　▗▅▖◥▄　▀◣　　█▊
+▐　▕▎◥▖◣◤　　　　◢██
+█◣　◥▅█▀　　　　▐██◤
+▐█▙▂　　     　◢██◤
+◥██◣　　　　◢▄◤
+ 　　▀██▅▇▀
+
+
+114514 前端后端和网站的部署全是我一个人完成，累死辣啊啊啊啊啊啊啊！！！！
+哲学♂114514♂自由♂蕉♂原蛋白
+ -->
+ 

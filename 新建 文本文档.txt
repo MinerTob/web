@@ -1,0 +1,1711 @@
+forget.js:
+document.addEventListener("DOMContentLoaded", function() {
+    const registerForm = document.querySelector('#register-form');
+    const loginForm = document.querySelector('#login-form');
+    const rememberMeCheckbox = document.querySelector('#remember_me');
+
+    // 注册表单逻辑
+    if (registerForm) {
+        const emailInput = registerForm.querySelector('input[type="email"]');
+        const passwordInputs = registerForm.querySelectorAll('input[type="password"]');
+        const confirmPasswordInput = registerForm.querySelector('input[name="confirmPassword"]'); // 添加确认密码输入框的选择
+
+        // 实时检查输入 - 电子邮箱
+        emailInput.addEventListener("input", function() {
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailPattern.test(emailInput.value)) {
+                emailInput.setCustomValidity("请输入有效的电子邮箱格式！");
+            } else {
+                emailInput.setCustomValidity(""); // 清除错误信息
+            }
+        });
+
+        // 实时检查输入 - 密码
+        passwordInputs.forEach(input => {
+            input.addEventListener("input", function() {
+                const password = passwordInputs[0].value; // 获取密码输入框的值
+                const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&.])[A-Za-z\d@$!%*?&.]{8,}$/; // 密码复杂性正则表达式
+                if (!passwordPattern.test(password)) {
+                    input.setCustomValidity("密码必须至少包含8个字符，包括一个大写字母、一个小写字母、一个数字和一个特殊字符。");
+                } else {
+                    input.setCustomValidity(""); // 清除错误信息
+                }
+
+                // 检查确认密码是否一致
+                if (confirmPasswordInput.value && confirmPasswordInput.value !== password) {
+                    confirmPasswordInput.setCustomValidity("两次输入的密码不一致，请检查！");
+                } else {
+                    confirmPasswordInput.setCustomValidity(""); // 清除错误信息
+                }
+            });
+        });
+
+        // 确认密码输入框的事件监听
+        confirmPasswordInput.addEventListener("input", function() {
+            const password = passwordInputs[0].value;
+            if (confirmPasswordInput.value !== password) {
+                confirmPasswordInput.setCustomValidity("两次输入的密码不一致，请检查！");
+            } else {
+                confirmPasswordInput.setCustomValidity(""); // 清除错误信息
+            }
+        });
+
+        // 注册表单提交事件
+        registerForm.addEventListener("submit", function(event) {
+            event.preventDefault(); // 阻止默认提交行为
+
+            const email = emailInput.value;
+            const password = passwordInputs[0].value;
+            const confirmPassword = confirmPasswordInput.value;
+
+            // 检查两次密码是否一致
+            if (password !== confirmPassword) {
+                alert("两次输入的密码不一致，请检查！");
+                return;
+            }
+
+            // 检查邮箱是否已被注册
+            fetch('/check-email-existence', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email }), // 将数据转换为JSON格式
+            })
+            .then(response => {
+                if (response.ok) {
+                    // 邮箱未被注册，继续进行注册
+                    fetch('/register', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ email, password }), // 将数据转换为JSON格式
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            // 将邮箱存储到 localStorage
+                            localStorage.setItem('rememberedEmail', email);
+                            alert("注册成功！");
+                            window.location.href = "secondindex.html"; // 跳转到指定地址
+                        } else {
+                            alert("注册失败，请重试！");
+                        }
+                    })
+                    .catch(error => {
+                        console.error("发生错误：", error);
+                        alert("注册过程中发生错误，请稍后重试！");
+                    });
+                } else {
+                    alert("账户已存在，请使用其他邮箱！");
+                }
+            })
+            .catch(error => {
+                console.error("检查邮箱存在性时发生错误：", error);
+                alert("检查电子邮箱时发生错误，请稍后重试！");
+            });
+        });
+    }
+
+    // 登录功能逻辑
+    if (loginForm) {
+        loginForm.addEventListener("submit", function(event) {
+            event.preventDefault(); // 阻止默认提交行为
+
+            const email = loginForm.querySelector('input[type="email"]').value;
+            const password = loginForm.querySelector('input[type="password"]').value;
+
+            // 确保邮箱和密码不为空
+            if (email && password) {
+                // 发送登录信息到服务器
+                fetch('/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password }), // 将数据转换为JSON格式
+                })
+                .then(response => {
+                    if (response.ok) {
+                        // 如果“记住我”被勾选，则保存邮箱和密码
+                        if (rememberMeCheckbox.checked) {
+                            localStorage.setItem('rememberedEmail', email);
+                            localStorage.setItem('rememberedPassword', password); // 注意: 存储密码并不安全，谨慎使用
+                        } else {
+                            // 如果没有勾选，则清除已保存的内容
+                            localStorage.removeItem('rememberedEmail');
+                            localStorage.removeItem('rememberedPassword');
+                        }
+                        alert("登录成功！");
+                        window.location.href = "secondindex.html"; // 跳转到指定地址
+                    } else {
+                        return response.text().then(text => { throw new Error(text); });
+                    }
+                })
+                .catch(error => {
+                    alert(error.message); // 显示账户不存在或密码错误信息
+                });
+            } else {
+                alert("请输入有效的电子邮件和密码！");
+            }
+        });
+
+        // 尝试获取上次登录保存的邮箱和密码
+        const rememberedEmail = localStorage.getItem('rememberedEmail');
+        const rememberedPassword = localStorage.getItem('rememberedPassword');
+        if (rememberedEmail) {
+            loginForm.querySelector('input[type="email"]').value = rememberedEmail;
+            rememberMeCheckbox.checked = true; // 勾选“记住我”框
+        }
+        if (rememberedPassword) {
+            loginForm.querySelector('input[type="password"]').value = rememberedPassword; // 注意：此处实现仅供参考，通常密码不应被存储和直接显示
+        }
+    }
+
+    // 重置密码功能
+    const resetPasswordForm = document.getElementById('reset-password-form');
+    if (resetPasswordForm) {
+        const resetEmailInput = resetPasswordForm.querySelector('input[type="email"]');
+        const newPasswordInputs = resetPasswordForm.querySelectorAll('input[type="password"]');
+        const resetConfirmPasswordInput = newPasswordInputs[1]; // 确认新密码输入框
+
+        // 实时检查输入 - 新密码
+        newPasswordInputs[0].addEventListener("input", function() {
+            const newPassword = newPasswordInputs[0].value; // 获取新密码输入框的值
+            const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&.])[A-Za-z\d@$!%*?&.]{8,}$/; // 更新密码复杂性正则表达式
+            if (!passwordPattern.test(newPassword)) {
+                newPasswordInputs[0].setCustomValidity("密码必须至少包含8个字符，包括一个大写字母、一个小写字母、一个数字和一个特殊字符。");
+            } else {
+                newPasswordInputs[0].setCustomValidity(""); // 清除错误信息
+            }
+
+            // 检查确认密码是否一致
+            if (resetConfirmPasswordInput.value && resetConfirmPasswordInput.value !== newPassword) {
+                resetConfirmPasswordInput.setCustomValidity("两次输入的密码不一致，请检查！");
+            } else {
+                resetConfirmPasswordInput.setCustomValidity(""); // 清除错误信息
+            }
+        });
+
+        // 确认新密码输入框的事件监听
+        resetConfirmPasswordInput.addEventListener("input", function() {
+            const newPassword = newPasswordInputs[0].value;
+            if (resetConfirmPasswordInput.value !== newPassword) {
+                resetConfirmPasswordInput.setCustomValidity("两次输入的密码不一致，请检查！");
+            } else {
+                resetConfirmPasswordInput.setCustomValidity(""); // 清除错误信息
+            }
+        });
+
+        // 重置密码表单提交事件
+        resetPasswordForm.addEventListener("submit", function(event) {
+            event.preventDefault(); // 阻止默认提交行为
+
+            const email = resetEmailInput.value;
+            const newPassword = newPasswordInputs[0].value;
+            const confirmPassword = resetConfirmPasswordInput.value;
+
+            // 简单验证邮箱和密码是否输入
+            if (email && newPassword && confirmPassword) {
+                if (newPassword !== confirmPassword) {
+                    alert("两次输入的密码不一致，请检查！");
+                    return;
+                }
+
+                // 发送重置密码信息到服务器
+                fetch('/reset-password', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, newPassword }), // 将数据转换为JSON格式
+                })
+                .then(response => {
+                    if (response.ok) {
+                        alert("密码重置成功！请使用新密码登录。");
+                        window.location.href = "login.html"; // 定向到登录页面
+                    } else {
+                        return response.text().then(text => { throw new Error(text); });
+                    }
+                })
+                .catch(error => {
+                    alert(error.message); // 显示账户不存在信息
+                });
+            } else {
+                alert("请输入有效的电子邮箱和密码！");
+            }
+        });
+    }
+
+    // 动态链接切换
+    const registerLink = document.querySelector('a[href="#register"]');
+    const loginLink = document.querySelector('a[href="#login"]');
+    const resetLink = document.querySelector('a[href="#reset"]');
+
+    // 切换到注册页面
+    if (registerLink) {
+        registerLink.addEventListener("click", function(event) {
+            event.preventDefault();
+            window.location.href = "register.html"; 
+        });
+    }
+
+    // 切换到登录页面
+    if (loginLink) {
+        loginLink.addEventListener("click", function(event) {
+            event.preventDefault();
+            window.location.href = "login.html"; 
+        });
+    }
+
+    // 切换到重置密码页面
+    if (resetLink) {
+        resetLink.addEventListener("click", function(event) {
+            event.preventDefault();
+            window.location.href = "resetPassword.html"; 
+        });
+    }
+});
+server.js:
+const express = require('express');
+const path = require('path');
+const fs = require('fs');
+const https = require('https');
+const axios = require('axios');
+
+const app = express();
+const port = process.env.PORT || 443;
+
+// HCaptcha 的私密密钥
+const HCAPTCHA_SECRET_KEY = 'e68091ba-9876-48f4-bd9a-56fe480810a8'; // 替换为您的新密钥
+
+// 使用内置中间件解析 JSON 请求体
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// 提供根目录下的 HTML 和其他静态文件
+app.use(express.static(__dirname));
+
+// 默认首页路由
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// 检查邮箱是否存在的路由
+app.post('/check-email-existence', (req, res) => {
+    const email = req.body.email;
+    const passwordFile = path.join(__dirname, 'password', 'password.txt');
+
+    if (fs.existsSync(passwordFile)) {
+        const data = fs.readFileSync(passwordFile, 'utf-8');
+        const lines = data.split('\n');
+
+        for (let line of lines) {
+            if (line.includes(`Email: ${email}`)) {
+                return res.status(409).send('账户已存在'); // 邮箱已被注册
+            }
+        }
+    }
+    
+    return res.send('邮箱可用'); // 邮箱未被注册
+});
+
+// 处理注册请求
+app.post('/register', async (req, res) => {
+    const email = req.body.email;
+    const password = req.body.password;
+    const hcaptchaResponse = req.body['h-captcha-response'];
+
+    // 验证 HCaptcha（可选）
+    if (hcaptchaResponse) {
+        try {
+            const hcaptchaVerificationResponse = await axios.post(`https://hcaptcha.com/siteverify`, null, {
+                params: {
+                    secret: HCAPTCHA_SECRET_KEY,
+                    response: hcaptchaResponse,
+                },
+            });
+
+            // 检查验证结果
+            if (!hcaptchaVerificationResponse.data.success) {
+                return res.status(403).send('hCaptcha 验证失败，请重新尝试。');
+            }
+        } catch (error) {
+            console.error('hCaptcha 验证错误:', error);
+            return res.status(500).send('内部服务器错误');
+        }
+    }
+
+    const passwordDir = path.join(__dirname, 'password');
+    const passwordFile = path.join(passwordDir, 'password.txt');
+
+    // 确保目录存在
+    if (!fs.existsSync(passwordDir)) {
+        fs.mkdirSync(passwordDir);
+    }
+
+    const userData = `Email: ${email}, Password: ${password}\n`;
+    fs.appendFile(passwordFile, userData, (err) => {
+        if (err) {
+            console.error("写入文件时出现错误:", err);
+            return res.status(500).send('服务器内部错误');
+        }
+        res.send('注册成功！');
+    });
+});
+
+// 处理登录请求
+app.post('/login', async (req, res) => {
+    const email = req.body.email;
+    const password = req.body.password;
+    const hcaptchaResponse = req.body['h-captcha-response'];
+
+    // 验证 HCaptcha（可选）
+    if (hcaptchaResponse) {
+        try {
+            const hcaptchaVerificationResponse = await axios.post(`https://hcaptcha.com/siteverify`, null, {
+                params: {
+                    secret: HCAPTCHA_SECRET_KEY,
+                    response: hcaptchaResponse,
+                },
+            });
+
+            // 检查验证结果
+            if (!hcaptchaVerificationResponse.data.success) {
+                return res.status(403).send('hCaptcha 验证失败，请重新尝试。');
+            }
+        } catch (error) {
+            console.error('hCaptcha 验证错误:', error);
+            return res.status(500).send('内部服务器错误');
+        }
+    }
+
+    const passwordFile = path.join(__dirname, 'password', 'password.txt');
+
+    if (!fs.existsSync(passwordFile)) {
+        return res.status(404).send('账户不存在');
+    }
+
+    // 读取文件并验证账户
+    const data = fs.readFileSync(passwordFile, 'utf-8');
+    const lines = data.split('\n');
+    let found = false;
+
+    for (let line of lines) {
+        if (line.includes(`Email: ${email}`)) {
+            found = true;
+            const savedPassword = line.split(', Password: ')[1]?.trim();
+            if (savedPassword === password) {
+                return res.send('登录成功！');
+            } else {
+                return res.status(401).send('密码错误');
+            }
+        }
+    }
+
+    if (!found) {
+        return res.status(404).send('账户不存在');
+    }
+});
+
+// 处理重置密码请求
+app.post('/reset-password', async (req, res) => {
+    const email = req.body.email;
+    const newPassword = req.body.newPassword;
+    
+    // 检查新密码是否为空
+    if (!newPassword) {
+        return res.status(400).send('新密码不能为空');
+    }
+
+    const passwordFile = path.join(__dirname, 'password', 'password.txt');
+
+    if (!fs.existsSync(passwordFile)) {
+        return res.status(404).send('账户不存在');
+    }
+
+    // 读取文件并验证账户
+    const data = fs.readFileSync(passwordFile, 'utf-8');
+    const lines = data.split('\n');
+    let updated = false;
+
+    // 检查邮箱是否存在，并更新密码
+    for (let i = 0; i < lines.length; i++) {
+        if (lines[i].includes(`Email: ${email}`)) {
+            lines[i] = `Email: ${email}, Password: ${newPassword}`; // 更新密码
+            updated = true;
+            break;
+        }
+    }
+
+    // 如果未找到该邮箱，则返回“账户不存在”消息
+    if (!updated) {
+        return res.status(404).send('账户不存在');
+    }
+
+    // 将更新后的数据写回文件
+    fs.writeFileSync(passwordFile, lines.join('\n'));
+    res.send('密码重置成功！');
+});
+
+// 加载 SSL 证书
+const sslOptions = {
+    key: fs.readFileSync(path.join(__dirname, 'key', 'Nginx', 'privkey.key')), // 私钥路径
+    cert: fs.readFileSync(path.join(__dirname, 'key', 'Nginx', 'fullchain.pem')) // 证书路径
+};
+
+// 启动 HTTPS 服务器，绑定到特定 IP 地址
+const hostname = '192.168.1.61'; // 绑定到特定 IP 地址
+https.createServer(sslOptions, app).listen(port, hostname, () => {
+    console.log(`HTTPS 服务器正在运行，访问 https://${hostname}:${port}`);
+});
+index.css:
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f7f7f7;
+    margin: 0;
+    padding: 0;
+    color: #333;
+}
+
+.navbar {
+    background-color: #007bff; /* 蓝色 */
+    overflow: hidden;
+    position: relative; /* 确保下拉框基于navbar定位 */
+}
+
+.navbar a {
+    float: left;
+    display: block;
+    color: #ffffff;
+    text-align: center;
+    padding: 14px 20px;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.navbar a:hover {
+    background-color: #0056b3; /* 深蓝色 */
+}
+
+.navbar .login-btn {
+    float: right;
+}
+
+.avatar {
+    height: 40px; /* 自定义头像高度 */
+    width: 40px; /* 自定义头像宽度 */
+    border-radius: 50%; /* 圆形头像 */
+    cursor: pointer; /* 指针样式 */
+    float: right; /* 右对齐 */
+    margin-right: 10px; /* 右侧间距 */
+    z-index: 2; /* 确保头像在较高层级 */
+    position: relative; /* 使用相对定位 */
+}
+
+.dropdown {
+    display: none; /* 初始隐藏 */
+    position: absolute;
+    right: 10px; /* 下拉菜单右对齐 */
+    top: 50px; /* 调整为头像的下方 */
+    background-color: white;
+    border: 1px solid #ccc;
+    width: 150px; /* 设置下拉菜单的宽度 */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); /* 添加阴影效果 */
+    z-index: 1000; /* 确保下拉菜单位于最上层 */
+}
+
+.dropdown-menu {
+    padding: 8px;
+}
+
+.dropdown-menu a {
+    color: black; 
+    text-decoration: none; 
+    display: block;
+    padding: 4px 8px; 
+}
+
+.dropdown-menu a:hover {
+    background-color: #f0f0f0; 
+}
+
+h1 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+}
+
+.image-container {
+    position: relative;
+    margin: 20px 0; /* 在标题和图片之间增加间距 */
+}
+
+.image-container img {
+    max-width: 100%; /* 限制图片宽度以适应容器 */
+    height: auto; /* 自适应高度 */
+    border-radius: 8px; /* 圆角 */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.subtitle {
+    position: absolute;
+    top: 40%; /* Move the subtitle up */
+    left: 50%; /* Center horizontally */
+    transform: translate(-50%, -50%); /* Centering */
+    color: white; /* Set text color to white */
+    font-size: 9rem; /* Keep font size */
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7); /* Adding shadow for better visibility */
+    text-align: center; /* Center align text */
+}
+
+.software-download {
+    position: absolute;
+    top: 75%; /* 将按钮下移 */
+    left: 50%; /* 水平居中 */
+    transform: translate(-50%, -50%); /* 中心对齐 */
+    padding: 12px 0; /* 垂直内边距 */
+    background-color: #007bff; /* 按钮背景色 */
+    color: #ffffff; /* 文字颜色 */
+    text-decoration: none; /* 移除下划线 */
+    border-radius: 32px; /* 圆角 */
+    transition: background-color 0.3s, box-shadow 0.3s; /* 过渡效果 */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* 阴影效果 */
+    font-size: 1.2rem; /* 字体大小 */
+    display: flex; /* 使用 flexbox 对齐 */
+    align-items: center; /* 垂直居中 */
+    justify-content: center; /* 水平居中对齐文本和图标 */
+    width: 350px; /* 设置按钮宽度 */
+    text-align: center; /* 水平居中对齐文本 */
+    line-height: 36px; /* 行高 */
+    box-sizing: border-box; /* 包括内边距在宽度和高度内 */
+}
+
+.software-download:hover {
+    background-color: #0056b3; /* 悬停效果 */
+}
+
+.download-icon {
+    width: 80px; /* 图标宽度 */
+    height: auto; /* 高度自适应 */
+    margin-right: 8px; /* 图标与文本之间的间距 */
+}
+
+/* 内容区域整体布局 */
+.content-container {
+    display: flex; /* 使用 flex布局 */
+    max-width: 1200px; /* 限制整体宽度 */
+    margin: 20px auto; /* 居中 */
+}
+
+/* 软件介绍部分样式 */
+.introduction-container {
+    max-width: 50%; /* 限制介绍部分的最大宽度 */
+    margin: 0; /* 去除上下边距 */
+    text-align: left; /* 文字左对齐 */
+}
+
+.software-title {
+    font-size: 4.5rem; /* 标题大小 */
+    color: black; /* 标题颜色 */
+    margin: 20px 0; /* 上下间距 */
+}
+
+.software-description {
+    font-size: 2.25rem; /* 字体大小为软件介绍标题的一半 */
+    line-height: 1.6; /* 行高 */
+    color: #333; /* 文字颜色 */
+    margin: 10px 0; /* 上下间距 */
+}
+
+/* 侧边图片样式 */
+.image-sidebar {
+    margin-left: 20px; /* 左侧空隙 */
+}
+
+.sidebar-image {
+    max-width: 600px; /* 增加侧边图片的最大宽度为原来的两倍 */
+    height: auto; /* 自适应高度 */
+    border-radius: 8px; /* 圆角 */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 阴影效果 */
+}
+
+/* 新增使用教程部分样式 */
+.tutorial-container {
+    margin: 20px auto; /* 添加上下间距 */
+    max-width: 800px; /* 设置最大宽度 */
+    text-align: center; /* 使文字居中 */
+    transform: scale(1); /* 整体缩放到75% */
+    transform-origin: top center; /* 设置缩放原点为顶部中心 */
+}
+
+/* 将教程列表设为flex布局 */
+.tutorial-list {
+    list-style-type: none; /* 去掉默认的样式 */
+    padding-left: 0; /* 去掉左侧内边距 */
+    display: flex; /* 设置为flex布局 */
+    flex-direction: column; /* 竖向排列 */
+    align-items: center; /* 水平居中 */
+}
+
+/* 列表项样式 */
+.tutorial-list li {
+    font-size: 1.5rem; /* 列表项字体大小 */
+    margin: 10px 0; /* 添加上下间距 */
+    width: 100%; /* 设置最宽为100%以便子元素居中 */
+    text-align: left; /* 文字左对齐，可根据需求调整 */
+    max-width: 600px; /* 可根据实际需求限制每个步骤的最大宽度 */
+}
+
+/* 调整使用教程部分的图片样式以确保其始终为75% */
+.tutorial-image {
+    display: block; /* 确保是块级元素 */
+    width: 75%; /* 设置图片宽度为75% */
+    max-width: 800px; /* 限制最大宽度（可选） */
+    height: auto; /* 高度自适应 */
+    margin: 10px auto; /* 添加上下间距，并水平居中 */
+    border-radius: 4px; /* 图片圆角 */
+}
+
+/* 针对first.png的样式 */
+.first-image {
+    display: block; /* 确保是块级元素 */
+    width: 100%; /* 图片宽度为100% */
+    height: auto; /* 高度自适应 */
+    margin: 10px auto; /* 添加上下间距，并水平居中 */
+    border-radius: 4px; /* 图片圆角 */
+}
+
+/* 新增版权信息部分样式 */
+.footer {
+    background-color: #f1f1f1;
+    padding: 20px;
+    text-align: center;
+    position: relative;
+    bottom: 0;
+    width: 100%;
+}
+
+.footer p {
+    margin: 0;
+    color: #666; /* 版权信息颜色 */
+}
+styles.css:
+.circles {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+.circles li {
+    position: absolute;
+    display: block;
+    list-style: none;
+    width: 20px;
+    height: 20px;
+    background: rgba(255, 255, 255, 0.2);
+    animation: animate 25s linear infinite;
+    bottom: -150px;
+}
+.circles li:nth-child(1) {
+    left: 25%;
+    width: 80px;
+    height: 80px;
+    animation-delay: 0s;
+}
+.circles li:nth-child(2) {
+    left: 10%;
+    width: 20px;
+    height: 20px;
+    animation-delay: 2s;
+    animation-duration: 12s;
+}
+.circles li:nth-child(3) {
+    left: 70%;
+    width: 20px;
+    height: 20px;
+    animation-delay: 4s;
+}
+.circles li:nth-child(4) {
+    left: 40%;
+    width: 60px;
+    height: 60px;
+    animation-delay: 0s;
+    animation-duration: 18s;
+}
+.circles li:nth-child(5) {
+    left: 65%;
+    width: 20px;
+    height: 20px;
+    animation-delay: 0s;
+}
+.circles li:nth-child(6) {
+    left: 75%;
+    width: 110px;
+    height: 110px;
+    animation-delay: 3s;
+}
+.circles li:nth-child(7) {
+    left: 35%;
+    width: 150px;
+    height: 150px;
+    animation-delay: 7s;
+}
+.circles li:nth-child(8) {
+    left: 50%;
+    width: 25px;
+    height: 25px;
+    animation-delay: 15s;
+    animation-duration: 45s;
+}
+.circles li:nth-child(9) {
+    left: 20%;
+    width: 15px;
+    height: 15px;
+    animation-delay: 2s;
+    animation-duration: 35s;
+}
+.circles li:nth-child(10) {
+    left: 85%;
+    width: 150px;
+    height: 150px;
+    animation-delay: 0s;
+    animation-duration: 11s;
+}
+@keyframes animate {
+    0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 1;
+        border-radius: 0;
+    }
+
+    100% {
+        transform: translateY(-1000px) rotate(720deg);
+        opacity: 0;
+        border-radius: 50%;
+    }
+}
+index.html:
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>父母性别查询器官网</title>
+    <link rel="stylesheet" href="index.css"> <!-- 引用新的 CSS 文件 -->
+</head>
+<body>
+
+    <div class="navbar">
+        <a href="login.html" class="login-btn">登录/注册</a>
+        <a href="index.html" class="index-btn">首页</a>
+        <a href="software-introduction.html" class="index-btn">软件介绍</a>
+        <a href="usage-method.html" class="index-btn">使用方法</a>
+        <a class="about-link" href="https://username-github-io.onrender.com/" target="_blank">关于作者（矿工Tob）</a>
+    </div>
+
+    <h1 style="text-align: center;">欢迎来到父母性别查询器官网</h1>
+
+    <div class="image-container">
+        <img src="images/sunflower.jpg" alt="Sunflower">
+        <div class="subtitle">
+            <div>让神金，</div>
+            <div>深入人心</div>
+        </div>
+        <a href="#" class="software-download" id="downloadBtn">
+            <img src="images/windows-icon.png" alt="Windows Icon" class="download-icon"> 
+            <span>下载 Windows 版</span>        
+        </a>        
+    </div>
+
+    <div class="footer">
+        <p>&copy; 2024 父母性别查询器</p>
+    </div>
+
+    <script>
+        document.getElementById('downloadBtn').addEventListener('click', function(event) {
+            const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+                alert("请先登录或注册您的账号。");
+                window.location.href = "login.html"; // 跳转到登录页面
+        });
+    </script>
+</body>
+</html>
+<!-- 
+       　  　▃▆█▇▄▖
+　 　 　 ▟◤▖　　　◥█▎
+   　 ◢◤　 ▐　　　 　▐▉
+　 ▗◤　　　▂　▗▖　　▕█▎
+　◤　▗▅▖◥▄　▀◣　　█▊
+▐　▕▎◥▖◣◤　　　　◢██
+█◣　◥▅█▀　　　　▐██◤
+▐█▙▂　　     　◢██◤
+◥██◣　　　　◢▄◤
+ 　　▀██▅▇▀
+
+
+114514 前端后端和网站的部署全是我一个人完成，累死辣啊啊啊啊啊啊啊！！！！
+哲学♂114514♂自由♂蕉♂原蛋白
+ -->
+ login.html:
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>父母性别查询器官网</title>
+    <link rel="stylesheet" href="https://unpkg.com/tailwindcss@2.2.4/dist/tailwind.min.css" />
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://www.hcaptcha.com/1/api.js" async defer></script>
+    <script src="forget.js" defer></script>
+</head>
+<body>
+    <h1 class="hidden">父母性别查询器官网</h1>
+    <div class="relative min-h-screen flex">
+        <div class="flex flex-col sm:flex-row items-center md:items-start sm:justify-center md:justify-start flex-auto min-w-0 bg-white">
+            <div class="sm:w-1/2 xl:w-3/5 h-full hidden md:flex flex-auto items-center justify-center p-10 overflow-hidden bg-purple-900 text-white bg-no-repeat bg-cover relative" style="background-image: url(img.jpg)">
+                <div class="absolute bg-gradient-to-b from-indigo-600 to-blue-500 opacity-75 inset-0 z-0"></div>
+                <div class="w-full max-w-md z-10">
+                    <div class="sm:text-4xl xl:text-5xl font-bold leading-tight mb-6">父母性别查询器官网</div>
+                    <div class="sm:text-sm xl:text-md text-gray-200 font-normal">欢迎来到父母性别查询器官网，请先登录您的账号或注册一个新账号</div>
+                </div>
+            </div>
+            <div class="md:flex md:items-center md:justify-center w-full sm:w-auto md:h-full w-2/5 xl:w-2/5 p-8 md:p-10 lg:p-14 sm:rounded-lg md:rounded-none bg-white">
+                <div class="max-w-md w-full mx-auto space-y-8">
+                    <div class="text-center">
+                        <h2 class="mt-6 text-3xl font-bold text-gray-900">欢迎回来</h2>
+                    </div>
+                    <form class="mt-8 space-y-6" id="login-form" action="/login" method="POST">
+                        <div class="relative">
+                            <label class="ml-3 text-sm font-bold text-gray-700 tracking-wide">电子邮箱</label>
+                            <input class="w-full text-base px-4 py-2 border-b border-gray-300 focus:outline-none rounded-2xl focus:border-indigo-500" type="email" name="email" placeholder="请输入电子邮箱" required />
+                        </div>
+                        <div class="mt-8 content-center">
+                            <label class="ml-3 text-sm font-bold text-gray-700 tracking-wide">密码</label>
+                            <input class="w-full content-center text-base px-4 py-2 border-b rounded-2xl border-gray-300 focus:outline-none focus:border-indigo-500" type="password" name="password" placeholder="请输入密码" required />
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <input id="remember_me" name="remember_me" type="checkbox" class="h-4 w-4 bg-blue-500 focus:ring-blue-400 border-gray-300 rounded" />
+                                <label for="remember_me" class="ml-2 block text-sm text-gray-900">记住我</label>
+                            </div>
+                            <div class="text-sm">
+                                <a href="#reset" class="text-indigo-400 hover:text-blue-500">忘记密码？</a>
+                            </div>
+                        </div>
+                        <!-- HCaptcha -->
+                        <div class="h-captcha" data-sitekey="e68091ba-9876-48f4-bd9a-56fe480810a8"></div>
+                        <div>
+                            <button type="submit" class="w-full flex justify-center bg-gradient-to-r from-indigo-500 to-blue-600 hover:bg-gradient-to-l hover:from-blue-500 hover:to-indigo-600 text-gray-100 p-4 rounded-full tracking-wide font-semibold shadow-lg cursor-pointer transition ease-in duration-500">登 录</button>
+                        </div>
+                        <p class="items-center justify-center mt-10 text-center text-md text-gray-500">
+                            <span>还没有账号？</span>
+                            <a href="register.html" class="text-indigo-400 hover:text-blue-500 no-underline hover:underline cursor-pointer transition ease-in duration-300">立即注册</a>
+                        </p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+<!-- 
+       　  　▃▆█▇▄▖
+　 　 　 ▟◤▖　　　◥█▎
+   　 ◢◤　 ▐　　　 　▐▉
+　 ▗◤　　　▂　▗▖　　▕█▎
+　◤　▗▅▖◥▄　▀◣　　█▊
+▐　▕▎◥▖◣◤　　　　◢██
+█◣　◥▅█▀　　　　▐██◤
+▐█▙▂　　     　◢██◤
+◥██◣　　　　◢▄◤
+ 　　▀██▅▇▀
+
+
+114514 前端后端和网站的部署全是我一个人完成，累死辣啊啊啊啊啊啊啊！！！！
+哲学♂114514♂自由♂蕉♂原蛋白
+ -->
+ register.html:
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>父母性别查询器官网</title>
+    <link rel="stylesheet" href="https://unpkg.com/tailwindcss@2.2.4/dist/tailwind.min.css" />
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://www.hcaptcha.com/1/api.js" async defer></script>
+    <script src="forget.js" defer></script>
+</head>
+<body>
+    <h1 class="hidden">父母性别查询器官网</h1>
+    <div class="relative min-h-screen flex">
+        <div class="flex flex-col sm:flex-row items-center md:items-start sm:justify-center md:justify-start flex-auto min-w-0 bg-white">
+            <div class="sm:w-1/2 xl:w-3/5 h-full hidden md:flex flex-auto items-center justify-center p-10 overflow-hidden bg-purple-900 text-white bg-no-repeat bg-cover relative" style="background-image: url(img.jpg)">
+                <div class="absolute bg-gradient-to-b from-indigo-600 to-blue-500 opacity-75 inset-0 z-0"></div>
+                <div class="w-full max-w-md z-10">
+                    <div class="sm:text-4xl xl:text-5xl font-bold leading-tight mb-6">父母性别查询器官网</div>
+                    <div class="sm:text-sm xl:text-md text-gray-200 font-normal">欢迎注册您的账户以使用父母性别查询器的服务</div>
+                </div>
+            </div>
+            <div class="md:flex md:items-center md:justify-center w-full sm:w-auto md:h-full w-2/5 xl:w-2/5 p-8 md:p-10 lg:p-14 sm:rounded-lg md:rounded-none bg-white">
+                <div class="max-w-md w-full mx-auto space-y-8">
+                    <div class="text-center">
+                        <h2 class="mt-6 text-3xl font-bold text-gray-900">欢迎注册</h2>
+                        <p class="mt-2 text-sm text-gray-500">在下面填写您的信息</p>
+                    </div>
+                    <form class="mt-8 space-y-6" id="register-form" action="/register" method="POST">
+                        <div class="relative">
+                            <label class="ml-3 text-sm font-bold text-gray-700 tracking-wide">电子邮箱</label>
+                            <input class="w-full text-base px-4 py-2 border-b border-gray-300 focus:outline-none rounded-2xl focus:border-indigo-500" type="email" name="email" placeholder="请输入电子邮箱" required />
+                        </div>
+                        <div class="relative">
+                            <label class="ml-3 text-sm font-bold text-gray-700 tracking-wide">密码</label>
+                            <input class="w-full text-base px-4 py-2 border-b border-gray-300 focus:outline-none rounded-2xl focus:border-indigo-500" type="password" name="password" placeholder="请输入密码" required />
+                        </div>
+                        <div class="relative">
+                            <label class="ml-3 text-sm font-bold text-gray-700 tracking-wide">确认密码</label>
+                            <input class="w-full text-base px-4 py-2 border-b border-gray-300 focus:outline-none rounded-2xl focus:border-indigo-500" type="password" name="confirmPassword" placeholder="重复输入密码" required />
+                        </div>
+                        <!-- HCaptcha -->
+                        <div class="h-captcha" data-sitekey="e68091ba-9876-48f4-bd9a-56fe480810a8"></div>
+                        <div>
+                            <button type="submit" class="w-full flex justify-center bg-gradient-to-r from-indigo-500 to-blue-600 hover:bg-gradient-to-l hover:from-blue-500 hover:to-indigo-600 text-gray-100 p-4 rounded-full tracking-wide font-semibold shadow-lg cursor-pointer transition ease-in duration-500">注 册</button>
+                        </div>
+                        <p class="items-center justify-center mt-10 text-center text-md text-gray-500">
+                            <span>已有账号？</span>
+                            <a href="login.html" class="text-indigo-400 hover:text-blue-500 no-underline hover:underline cursor-pointer transition ease-in duration-300">立即登录</a>
+                        </p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+<!-- 
+       　  　▃▆█▇▄▖
+　 　 　 ▟◤▖　　　◥█▎
+   　 ◢◤　 ▐　　　 　▐▉
+　 ▗◤　　　▂　▗▖　　▕█▎
+　◤　▗▅▖◥▄　▀◣　　█▊
+▐　▕▎◥▖◣◤　　　　◢██
+█◣　◥▅█▀　　　　▐██◤
+▐█▙▂　　     　◢██◤
+◥██◣　　　　◢▄◤
+ 　　▀██▅▇▀
+
+
+114514 前端后端和网站的部署全是我一个人完成，累死辣啊啊啊啊啊啊啊！！！！
+哲学♂114514♂自由♂蕉♂原蛋白
+ -->
+ resetPassword.html:
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>重置密码</title>
+    <link rel="stylesheet" href="https://unpkg.com/tailwindcss@2.2.4/dist/tailwind.min.css" />
+    <link rel="stylesheet" href="style.css" />
+    <script src="forget.js" defer></script>
+</head>
+<body>
+    <h1 class="hidden">重置密码</h1>
+    <div class="relative min-h-screen flex">
+        <div class="flex flex-col sm:flex-row items-center md:items-start sm:justify-center md:justify-start flex-auto min-w-0 bg-white">
+            <div class="sm:w-1/2 xl:w-3/5 h-full hidden md:flex flex-auto items-center justify-center p-10 overflow-hidden bg-purple-900 text-white bg-no-repeat bg-cover relative" style="background-image: url(img.jpg)">
+                <div class="absolute bg-gradient-to-b from-indigo-600 to-blue-500 opacity-75 inset-0 z-0"></div>
+                <div class="w-full max-w-md z-10">
+                    <div class="sm:text-4xl xl:text-5xl font-bold leading-tight mb-6">父母性别查询器官网</div>
+                    <div class="sm:text-sm xl:text-md text-gray-200 font-normal">请输入您的新密码和电子邮箱，用以重置密码。</div>
+                </div>
+            </div>
+            <div class="md:flex md:items-center md:justify-center w-full sm:w-auto md:h-full w-2/5 xl:w-2/5 p-8 md:p-10 lg:p-14 sm:rounded-lg md:rounded-none bg-white">
+                <div class="max-w-md w-full mx-auto space-y-8">
+                    <div class="text-center">
+                        <h2 class="mt-6 text-3xl font-bold text-gray-900">重置密码</h2>
+                        <p class="mt-2 text-sm text-gray-500">请输入您的电子邮箱和新密码</p>
+                    </div>
+                    <form class="mt-8 space-y-6" action="#" method="POST" id="reset-password-form">
+                        <div class="relative">
+                            <label class="ml-3 text-sm font-bold text-gray-700 tracking-wide">电子邮箱</label>
+                            <input class="w-full text-base px-4 py-2 border-b border-gray-300 focus:outline-none rounded-2xl focus:border-indigo-500" type="email" placeholder="请输入电子邮箱" required />
+                        </div>
+                        <div class="relative">
+                            <label class="ml-3 text-sm font-bold text-gray-700 tracking-wide">新密码</label>
+                            <input class="w-full text-base px-4 py-2 border-b border-gray-300 focus:outline-none rounded-2xl focus:border-indigo-500" type="password" placeholder="请输入新密码" required />
+                        </div>
+                        <div class="relative">
+                            <label class="ml-3 text-sm font-bold text-gray-700 tracking-wide">确认新密码</label>
+                            <input class="w-full text-base px-4 py-2 border-b border-gray-300 focus:outline-none rounded-2xl focus:border-indigo-500" type="password" placeholder="再次输入新密码" required />
+                        </div>
+                        <div>
+                            <button type="submit" class="w-full flex justify-center bg-gradient-to-r from-indigo-500 to-blue-600 hover:bg-gradient-to-l hover:from-blue-500 hover:to-indigo-600 text-gray-100 p-4 rounded-full tracking-wide font-semibold shadow-lg cursor-pointer transition ease-in duration-500">重置密码</button>
+                        </div>
+                        <p class="items-center justify-center mt-10 text-center text-md text-gray-500">
+                            <span>记得密码了吗？</span>
+                            <a href="#login" class="text-indigo-400 hover:text-blue-500 no-underline hover:underline cursor-pointer transition ease-in duration-300">立即登录</a>
+                        </p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+<!-- 
+       　  　▃▆█▇▄▖
+　 　 　 ▟◤▖　　　◥█▎
+   　 ◢◤　 ▐　　　 　▐▉
+　 ▗◤　　　▂　▗▖　　▕█▎
+　◤　▗▅▖◥▄　▀◣　　█▊
+▐　▕▎◥▖◣◤　　　　◢██
+█◣　◥▅█▀　　　　▐██◤
+▐█▙▂　　     　◢██◤
+◥██◣　　　　◢▄◤
+ 　　▀██▅▇▀
+
+
+114514 前端后端和网站的部署全是我一个人完成，累死辣啊啊啊啊啊啊啊！！！！
+哲学♂114514♂自由♂蕉♂原蛋白
+ -->
+ secondindex.html:
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>父母性别查询器官网</title>
+    <link rel="stylesheet" href="index.css"> <!-- 引用新的 CSS 文件 -->
+    <style>
+        body {
+            position: relative; /* 为下拉菜单的定位提供参考 */
+        }
+
+        .navbar {
+            background-color: #007bff; /* 蓝色 */
+            padding: 10px; /* 添加顶部内边距 */
+            display: flex; /* 使用flex布局 */
+            align-items: center; /* 垂直居中对齐 */
+            justify-content: flex-end; /* 向右对齐 */
+        }
+
+        .nav-links {
+            display: flex; /* 使用flex布局 */
+            align-items: center; /* 垂直居中对齐 */
+            margin-right: auto; /* 将链接部分推到左边 */
+        }
+
+        .welcome-message {
+            color: white; /* 欢迎信息颜色 */
+            font-size: 1.1rem; /* 欢迎信息字体大小 */
+            margin-right: 5px; /* 和头像的间距 */
+        }
+
+        .avatar {
+            height: 40px; /* 自定义头像高度 */
+            width: 40px; /* 自定义头像宽度 */
+            border-radius: 50%; /* 圆形头像 */
+            cursor: pointer; /* 指针样式 */
+        }
+
+        .dropdown {
+            display: none; /* 初始隐藏 */
+            position: fixed; /* 固定定位 */
+            right: 10px; /* 下拉菜单右对齐 */
+            top: 60px; /* 调整为头像的下方 */
+            background-color: white;
+            border: 1px solid #ccc;
+            width: 150px; /* 设置下拉菜单的宽度 */
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); /* 添加阴影效果 */
+            z-index: 20; /* 确保下拉菜单位于最上层 */
+        }
+
+        .dropdown-menu {
+            padding: 8px;
+        }
+
+        .dropdown-menu a {
+            color: black; 
+            text-decoration: none; 
+            display: block;
+            padding: 4px 8px; 
+        }
+
+        .dropdown-menu a:hover {
+            background-color: #f0f0f0; 
+        }
+    </style>
+</head>
+<body>
+
+    <div class="navbar">
+        <div class="nav-links">
+            <a href="secondindex.html" class="second-index-btn">首页</a>
+            <a href="secondsoftware-introduction.html" class="index-btn">软件介绍</a>
+            <a href="secondusage-method.html" class="second-index-btn">使用方法</a>
+            <a class="about-link" href="https://username-github-io.onrender.com/" target="_blank">关于作者（矿工Tob）</a>
+        </div>
+
+        <!-- 欢迎信息 -->
+        <span class="welcome-message" id="welcomeMessage">欢迎您，用户！</span>
+        
+        <!-- 头像 -->
+        <img src="images/man.png" alt="Avatar" class="avatar" id="avatar">
+        <div class="dropdown" id="dropdown">
+            <div class="dropdown-menu">
+                <a href="resetPassword.html">重置密码</a>
+                <a href="login.html">切换账号</a>
+                <a href="#" id="logout">退出登录</a>
+            </div>
+        </div>
+    </div>
+
+    <h1 style="text-align: center;">欢迎来到父母性别查询器官网</h1>
+
+    <div class="image-container">
+        <img src="images/sunflower.jpg" alt="Sunflower">
+        <div class="subtitle">
+            <div>让神金，</div>
+            <div>深入人心</div>
+        </div>
+        <a href="project/Parental_Gender_Finder_Installation_Package.exe" class="software-download">
+            <img src="images/windows-icon.png" alt="Windows Icon" class="download-icon"> 
+            <span>下载 Windows 版</span>        
+        </a>        
+    </div>
+
+    <div class="footer">
+        <p>&copy; 2024 父母性别查询器</p>
+    </div>
+
+    <script>
+        // 获取存储的邮箱信息并更新欢迎信息
+        const rememberedEmail = localStorage.getItem('rememberedEmail') || '用户';
+        document.getElementById('welcomeMessage').textContent = '欢迎您，' + rememberedEmail + '！';
+
+        // 头像点击事件
+        document.getElementById('avatar').addEventListener('click', function(event) {
+            event.stopPropagation(); // 阻止事件冒泡
+            const dropdown = document.getElementById('dropdown');
+            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+        });
+
+        // 退出登录事件
+        document.getElementById('logout').addEventListener('click', function() {
+            localStorage.setItem('isLoggedIn', 'false'); // 设置登录状态为未登录
+            window.location.href = 'index.html'; // 返回首页
+        });
+
+        // 点击其他区域隐藏下拉框
+        window.onclick = function(event) {
+            if (!event.target.matches('#avatar')) {
+                const dropdown = document.getElementById("dropdown");
+                dropdown.style.display = "none";
+            }
+        }
+    </script>
+</body>
+</html>
+<!-- 
+       　  　▃▆█▇▄▖
+　 　 　 ▟◤▖　　　◥█▎
+   　 ◢◤　 ▐　　　 　▐▉
+　 ▗◤　　　▂　▗▖　　▕█▎
+　◤　▗▅▖◥▄　▀◣　　█▊
+▐　▕▎◥▖◣◤　　　　◢██
+█◣　◥▅█▀　　　　▐██◤
+▐█▙▂　　     　◢██◤
+◥██◣　　　　◢▄◤
+ 　　▀██▅▇▀
+
+
+114514 前端后端和网站的部署全是我一个人完成，累死辣啊啊啊啊啊啊啊！！！！
+哲学♂114514♂自由♂蕉♂原蛋白
+ -->
+ secondsoftware-introduction.html:
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>软件介绍 - 父母性别查询器</title>
+    <link rel="stylesheet" href="index.css">
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh; /* 让页面高度至少为视口高度 */
+        }
+
+        .content-container {
+            flex: 1; /* 占据可用空间 */
+        }
+
+        .footer {
+            background-color: #f1f1f1; /* 背景颜色 */
+            padding: 20px;
+            text-align: center;
+        }
+
+        /* 导航栏的样式保持一致 */
+        .navbar {
+            background-color: #007bff; /* 蓝色 */
+            padding: 10px; /* 添加顶部内边距 */
+            z-index: 10; /* 设置z-index */
+            position: relative; /* 使下拉菜单相对位置 */
+            display: flex; /* 使用flex布局 */
+            align-items: center; /* 垂直居中对齐 */
+        }
+
+        .nav-links {
+            display: flex; /* 使用flex布局 */
+            align-items: center; /* 垂直居中对齐 */
+            margin-right: auto; /* 将链接部分推到左边 */
+        }
+
+        .welcome-message {
+            color: white; /* 欢迎信息颜色 */
+            font-size: 1.1rem; /* 欢迎信息字体大小 */
+            margin-right: 5px; /* 和头像的间距 */
+        }
+
+        .avatar {
+            height: 40px; /* 自定义头像高度 */
+            width: 40px; /* 自定义头像宽度 */
+            border-radius: 50%; /* 圆形头像 */
+            cursor: pointer; /* 指针样式 */
+            margin-left: 10px; /* 左侧间距 */
+        }
+
+        .dropdown {
+            display: none; /* 初始隐藏 */
+            position: fixed; /* 固定定位 */
+            right: 10px; /* 下拉菜单右对齐 */
+            top: 60px; /* 调整为头像的下方 */
+            background-color: white;
+            border: 1px solid #ccc;
+            width: 150px; /* 设置下拉菜单的宽度 */
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); /* 添加阴影效果 */
+            z-index: 20; /* 确保下拉菜单位于最上层 */
+        }
+
+        .dropdown-menu {
+            padding: 8px;
+        }
+
+        .dropdown-menu a {
+            color: black; 
+            text-decoration: none; 
+            display: block;
+            padding: 4px 8px; 
+        }
+
+        .dropdown-menu a:hover {
+            background-color: #f0f0f0; 
+        }
+    </style>
+</head>
+<body>
+
+    <div class="navbar">
+        <div class="nav-links">
+            <a href="secondindex.html" class="second-index-btn">首页</a>
+            <a href="secondsoftware-introduction.html" class="second-index-btn">软件介绍</a>
+            <a href="secondusage-method.html" class="second-index-btn">使用方法</a>
+            <a class="about-link" href="https://username-github-io.onrender.com/" target="_blank">关于作者（矿工Tob）</a>
+        </div>
+
+        <!-- 欢迎信息 -->
+        <span class="welcome-message" id="welcomeMessage">欢迎您，用户！</span>
+        
+        <!-- 头像 -->
+        <img src="images/man.png" alt="Avatar" class="avatar" id="avatar">
+        <div class="dropdown" id="dropdown">
+            <div class="dropdown-menu">
+                <a href="resetPassword.html">重置密码</a>
+                <a href="login.html">切换账号</a>
+                <a href="#" id="logout">退出登录</a>
+            </div>
+        </div>
+    </div>
+
+    <h1 style="text-align: center;">软件介绍</h1>
+    <div class="content-container">
+        <div class="introduction-container">
+            <h2 class="software-title">软件介绍</h2>
+            <p class="software-description">父母性别查询器是一款由矿工Tob独立开发的神金软件，您可以轻松查询您父母的性别（虽然并没有什么实际意义）。父母性别查询器支持多种语言（目前有九种），让世界各地的欢愉信徒能够轻松使用。</p>
+        </div>
+        <div class="image-sidebar">
+            <img src="images/fmxbcxq.png" alt="Image Description" class="sidebar-image">
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>&copy; 2024 父母性别查询器</p>
+    </div>
+
+    <script>
+        // 获取存储的邮箱信息并更新欢迎信息
+        const rememberedEmail = localStorage.getItem('rememberedEmail') || '用户';
+        document.getElementById('welcomeMessage').textContent = '欢迎您，' + rememberedEmail + '！';
+        
+        // 头像点击事件
+        document.getElementById('avatar').addEventListener('click', function(event) {
+            event.stopPropagation(); // 阻止事件冒泡
+            const dropdown = document.getElementById('dropdown');
+            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+        });
+
+        // 退出登录事件
+        document.getElementById('logout').addEventListener('click', function() {
+            localStorage.setItem('isLoggedIn', 'false'); // 设置登录状态为未登录
+            window.location.href = 'index.html'; // 返回首页
+        });
+
+        // 点击其他区域隐藏下拉框
+        window.onclick = function(event) {
+            if (!event.target.matches('#avatar')) {
+                const dropdown = document.getElementById("dropdown");
+                dropdown.style.display = "none";
+            }
+        }
+    </script>
+</body>
+</html>
+<!-- 
+       　  　▃▆█▇▄▖
+　 　 　 ▟◤▖　　　◥█▎
+   　 ◢◤　 ▐　　　 　▐▉
+　 ▗◤　　　▂　▗▖　　▕█▎
+　◤　▗▅▖◥▄　▀◣　　█▊
+▐　▕▎◥▖◣◤　　　　◢██
+█◣　◥▅█▀　　　　▐██◤
+▐█▙▂　　     　◢██◤
+◥██◣　　　　◢▄◤
+ 　　▀██▅▇▀
+
+
+114514 前端后端和网站的部署全是我一个人完成，累死辣啊啊啊啊啊啊啊！！！！
+哲学♂114514♂自由♂蕉♂原蛋白
+ -->
+ secondusage-method.html:
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>使用方法 - 父母性别查询器</title>
+    <link rel="stylesheet" href="index.css">
+    <style>
+        body {
+            position: relative; /* 为下拉菜单的定位提供参考 */
+        }
+
+        .navbar {
+            background-color: #007bff; /* 蓝色 */
+            padding: 10px; /* 添加顶部内边距 */
+            display: flex; /* 使用flex布局 */
+            align-items: center; /* 垂直居中对齐 */
+        }
+
+        .nav-links {
+            display: flex; /* 使用flex布局 */
+            align-items: center; /* 垂直居中对齐 */
+            margin-right: auto; /* 将链接部分推到左边 */
+        }
+
+        .welcome-message {
+            color: white; /* 欢迎信息颜色 */
+            font-size: 1.1rem; /* 欢迎信息字体大小 */
+            margin-right: 5px; /* 和头像的间距 */
+        }
+
+        .avatar {
+            height: 40px; /* 自定义头像高度 */
+            width: 40px; /* 自定义头像宽度 */
+            border-radius: 50%; /* 圆形头像 */
+            cursor: pointer; /* 指针样式 */
+            margin-left: 10px; /* 左侧间距 */
+        }
+
+        .dropdown {
+            display: none; /* 初始隐藏 */
+            position: fixed; /* 固定定位 */
+            right: 10px; /* 下拉菜单右对齐 */
+            top: 60px; /* 调整为头像的下方 */
+            background-color: white;
+            border: 1px solid #ccc;
+            width: 150px; /* 设置下拉菜单的宽度 */
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); /* 添加阴影效果 */
+            z-index: 20; /* 确保下拉菜单位于最上层 */
+        }
+
+        .dropdown-menu {
+            padding: 8px;
+        }
+
+        .dropdown-menu a {
+            color: black; 
+            text-decoration: none; 
+            display: block;
+            padding: 4px 8px; 
+        }
+
+        .dropdown-menu a:hover {
+            background-color: #f0f0f0; 
+        }
+    </style>
+</head>
+<body>
+
+    <div class="navbar">
+        <div class="nav-links">
+            <a href="secondindex.html" class="second-index-btn">首页</a>
+            <a href="secondsoftware-introduction.html" class="index-btn">软件介绍</a>
+            <a href="secondusage-method.html" class="second-index-btn">使用方法</a>
+            <a class="about-link" href="https://username-github-io.onrender.com/" target="_blank">关于作者（矿工Tob）</a>
+        </div>
+
+        <span class="welcome-message" id="welcomeMessage">欢迎您，用户！</span>
+        
+        <img src="images/man.png" alt="Avatar" class="avatar" id="avatar">
+        <div class="dropdown" id="dropdown">
+            <div class="dropdown-menu">
+                <a href="resetPassword.html">重置密码</a>
+                <a href="login.html">切换账号</a>
+                <a href="#" id="logout">退出登录</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="tutorial-container">
+        <h2 class="software-title">使用教程</h2>
+        <ul class="tutorial-list">
+            <li>1. 首先，在官网中点击下载此软件
+                <img src="images/first.png" alt="下载软件" class="tutorial-image first-image" />
+            </li>
+            <li>2. 等待下载完成，点击打开文件
+                <img src="images/second.png" alt="下载软件" class="tutorial-image" />
+            </li>
+            <li>3. 选择你的安装语言，点击安装
+                <img src="images/third.png" alt="下载软件" class="tutorial-image" />
+            </li>
+            <li>4. 选择你的安装路径，最好放在内存最多的的盘（强烈不建议放在C盘）
+                <img src="images/fourth.png" alt="下载软件" class="tutorial-image" />
+            </li>
+            <li>5. 点击创建桌面快捷方式，然后点击下一步
+                <img src="images/fifth.png" alt="下载软件" class="tutorial-image" />
+            </li>
+            <li>6. 确认安装路径无误后，点击安装
+                <img src="images/sixth.png" alt="下载软件" class="tutorial-image" />
+            </li>
+            <li>7. 等待安装完毕，先注册一个账号（可以乱填）
+                <img src="images/seventh.png" alt="下载软件" class="tutorial-image" />
+            </li>
+            <li>8. 注册成功后，回到登录页面，点击倒三角选择您注册的账号（最好点击记住密码），然后点击登录
+                <img src="images/eighth.png" alt="下载软件" class="tutorial-image" />
+            </li>
+            <li>9. 这样，您就可以开始使用软件了，可以选择您的语言进行查询
+                <img src="images/fmxbcxq.png" alt="下载软件" class="tutorial-image" />
+            </li>
+        </ul>
+    </div>
+
+    <div class="footer">
+        <p>&copy; 2024 父母性别查询器</p>
+    </div>
+    <script>
+        // 获取存储的邮箱信息并更新欢迎信息
+        const rememberedEmail = localStorage.getItem('rememberedEmail') || '用户';
+        document.getElementById('welcomeMessage').textContent = '欢迎您，' + rememberedEmail + '！';
+        
+        // 头像点击事件
+        document.getElementById('avatar').addEventListener('click', function(event) {
+            event.stopPropagation(); // 阻止事件冒泡
+            const dropdown = document.getElementById('dropdown');
+            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+        });
+
+        // 退出登录事件
+        document.getElementById('logout').addEventListener('click', function() {
+            localStorage.setItem('isLoggedIn', 'false'); // 设置登录状态为未登录
+            window.location.href = 'index.html'; // 返回首页
+        });
+
+        // 点击其他区域隐藏下拉框
+        window.onclick = function(event) {
+            if (!event.target.matches('#avatar')) {
+                const dropdown = document.getElementById("dropdown");
+                dropdown.style.display = "none";
+            }
+        }
+    </script>
+</body>
+</html>
+<!-- 
+       　  　▃▆█▇▄▖
+　 　 　 ▟◤▖　　　◥█▎
+   　 ◢◤　 ▐　　　 　▐▉
+　 ▗◤　　　▂　▗▖　　▕█▎
+　◤　▗▅▖◥▄　▀◣　　█▊
+▐　▕▎◥▖◣◤　　　　◢██
+█◣　◥▅█▀　　　　▐██◤
+▐█▙▂　　     　◢██◤
+◥██◣　　　　◢▄◤
+ 　　▀██▅▇▀
+
+
+114514 前端后端和网站的部署全是我一个人完成，累死辣啊啊啊啊啊啊啊！！！！
+哲学♂114514♂自由♂蕉♂原蛋白
+ -->
+ software-introduction.html:
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>软件介绍 - 父母性别查询器</title>
+    <link rel="stylesheet" href="index.css">
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh; /* 让页面高度至少为视口高度 */
+        }
+
+        .content-container {
+            flex: 1; /* 占据可用空间 */
+        }
+
+        .footer {
+            background-color: #f1f1f1; /* 背景颜色 */
+            padding: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="navbar">
+        <a href="login.html" class="login-btn">登录/注册</a>
+        <a href="index.html" class="index-btn">首页</a>
+        <a href="software-introduction.html" class="index-btn">软件介绍</a>
+        <a href="usage-method.html" class="index-btn">使用方法</a>
+        <a class="about-link" href="https://username-github-io.onrender.com/" target="_blank">关于作者（矿工Tob）</a>
+    </div>
+
+    <h1 style="text-align: center;">软件介绍</h1>
+    <div class="content-container">
+        <div class="introduction-container">
+            <h2 class="software-title">软件介绍</h2>
+            <p class="software-description">父母性别查询器是一款由矿工Tob独立开发的神金软件，您可以轻松查询您父母的性别（虽然并没有什么实际意义）。父母性别查询器支持多种语言（目前有九种），让世界各地的欢愉信徒能够轻松使用。</p>
+        </div>
+
+        <div class="image-sidebar">
+            <img src="images/fmxbcxq.png" alt="Image Description" class="sidebar-image">
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>&copy; 2024 父母性别查询器</p>
+    </div>
+
+</body>
+</html>
+<!-- 
+       　  　▃▆█▇▄▖
+　 　 　 ▟◤▖　　　◥█▎
+   　 ◢◤　 ▐　　　 　▐▉
+　 ▗◤　　　▂　▗▖　　▕█▎
+　◤　▗▅▖◥▄　▀◣　　█▊
+▐　▕▎◥▖◣◤　　　　◢██
+█◣　◥▅█▀　　　　▐██◤
+▐█▙▂　　     　◢██◤
+◥██◣　　　　◢▄◤
+ 　　▀██▅▇▀
+
+
+114514 前端后端和网站的部署全是我一个人完成，累死辣啊啊啊啊啊啊啊！！！！
+哲学♂114514♂自由♂蕉♂原蛋白
+ -->
+ usage-method.html:
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>使用方法 - 父母性别查询器</title>
+    <link rel="stylesheet" href="index.css">
+    
+</head>
+<body>
+
+    <div class="navbar">
+        <a href="login.html" class="login-btn">登录/注册</a>
+        <a href="index.html" class="index-btn">首页</a>
+        <a href="software-introduction.html" class="index-btn">软件介绍</a>
+        <a href="usage-method.html" class="index-btn">使用方法</a>
+        <a class="about-link" href="https://username-github-io.onrender.com/" target="_blank">关于作者（矿工Tob）</a>
+    </div>
+
+    <div class="tutorial-container">
+        <h2 class="software-title">使用教程</h2>
+        <ul class="tutorial-list">
+            <li>1. 首先，在官网中点击下载此软件
+                <img src="images/first.png" alt="下载软件" class="tutorial-image first-image" />
+            </li>
+            <li>2. 等待下载完成，点击打开文件
+                <img src="images/second.png" alt="下载软件" class="tutorial-image" />
+            </li>
+            <li>3. 选择你的安装语言，点击安装
+                <img src="images/third.png" alt="下载软件" class="tutorial-image" />
+            </li>
+            <li>4. 选择你的安装路径，最好放在内存最多的的盘（强烈不建议放在C盘）
+                <img src="images/fourth.png" alt="下载软件" class="tutorial-image" />
+            </li>
+            <li>5. 点击创建桌面快捷方式，然后点击下一步
+                <img src="images/fifth.png" alt="下载软件" class="tutorial-image" />
+            </li>
+            <li>6. 确认安装路径无误后，点击安装
+                <img src="images/sixth.png" alt="下载软件" class="tutorial-image" />
+            </li>
+            <li>7. 等待安装完毕，先注册一个账号（可以乱填）
+                <img src="images/seventh.png" alt="下载软件" class="tutorial-image" />
+            </li>
+            <li>8. 注册成功后，回到登录页面，点击倒三角选择您注册的账号（最好点击记住密码），然后点击登录
+                <img src="images/eighth.png" alt="下载软件" class="tutorial-image" />
+            </li>
+            <li>9. 这样，您就可以开始使用软件了，可以选择您的语言进行查询
+                <img src="images/fmxbcxq.png" alt="下载软件" class="tutorial-image" />
+            </li>
+        </ul>
+    </div>
+
+    <div class="footer">
+        <p>&copy; 2024 父母性别查询器</p>
+    </div>
+
+</body>
+</html>
+<!-- 
+       　  　▃▆█▇▄▖
+　 　 　 ▟◤▖　　　◥█▎
+   　 ◢◤　 ▐　　　 　▐▉
+　 ▗◤　　　▂　▗▖　　▕█▎
+　◤　▗▅▖◥▄　▀◣　　█▊
+▐　▕▎◥▖◣◤　　　　◢██
+█◣　◥▅█▀　　　　▐██◤
+▐█▙▂　　     　◢██◤
+◥██◣　　　　◢▄◤
+ 　　▀██▅▇▀
+
+
+114514 前端后端和网站的部署全是我一个人完成，累死辣啊啊啊啊啊啊啊！！！！
+哲学♂114514♂自由♂蕉♂原蛋白
+ -->

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>父母性别查询器官网</title>
+    <link rel="stylesheet" href="https://unpkg.com/tailwindcss@2.2.4/dist/tailwind.min.css" />
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://www.hcaptcha.com/1/api.js" async defer></script>
+    <script src="forget.js" defer></script>
+</head>
+<body>
+    <h1 class="hidden">父母性别查询器官网</h1>
+    <div class="relative min-h-screen flex">
+        <div class="flex flex-col sm:flex-row items-center md:items-start sm:justify-center md:justify-start flex-auto min-w-0 bg-white">
+            <div class="sm:w-1/2 xl:w-3/5 h-full hidden md:flex flex-auto items-center justify-center p-10 overflow-hidden bg-purple-900 text-white bg-no-repeat bg-cover relative" style="background-image: url(img.jpg)">
+                <div class="absolute bg-gradient-to-b from-indigo-600 to-blue-500 opacity-75 inset-0 z-0"></div>
+                <div class="w-full max-w-md z-10">
+                    <div class="sm:text-4xl xl:text-5xl font-bold leading-tight mb-6">父母性别查询器官网</div>
+                    <div class="sm:text-sm xl:text-md text-gray-200 font-normal">欢迎来到父母性别查询器官网，请先登录您的账号或注册一个新账号</div>
+                </div>
+            </div>
+            <div class="md:flex md:items-center md:justify-center w-full sm:w-auto md:h-full w-2/5 xl:w-2/5 p-8 md:p-10 lg:p-14 sm:rounded-lg md:rounded-none bg-white">
+                <div class="max-w-md w-full mx-auto space-y-8">
+                    <div class="text-center">
+                        <h2 class="mt-6 text-3xl font-bold text-gray-900">欢迎回来</h2>
+                    </div>
+                    <form class="mt-8 space-y-6" id="login-form" action="/login" method="POST">
+                        <div class="relative">
+                            <label class="ml-3 text-sm font-bold text-gray-700 tracking-wide">电子邮箱</label>
+                            <input class="w-full text-base px-4 py-2 border-b border-gray-300 focus:outline-none rounded-2xl focus:border-indigo-500" type="email" name="email" placeholder="请输入电子邮箱" required />
+                        </div>
+                        <div class="mt-8 content-center">
+                            <label class="ml-3 text-sm font-bold text-gray-700 tracking-wide">密码</label>
+                            <input class="w-full content-center text-base px-4 py-2 border-b rounded-2xl border-gray-300 focus:outline-none focus:border-indigo-500" type="password" name="password" placeholder="请输入密码" required />
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <input id="remember_me" name="remember_me" type="checkbox" class="h-4 w-4 bg-blue-500 focus:ring-blue-400 border-gray-300 rounded" />
+                                <label for="remember_me" class="ml-2 block text-sm text-gray-900">记住我</label>
+                            </div>
+                            <div class="text-sm">
+                                <a href="#reset" class="text-indigo-400 hover:text-blue-500">忘记密码？</a>
+                            </div>
+                        </div>
+                        <!-- HCaptcha -->
+                        <div class="h-captcha" data-sitekey="e68091ba-9876-48f4-bd9a-56fe480810a8"></div>
+                        <div>
+                            <button type="submit" class="w-full flex justify-center bg-gradient-to-r from-indigo-500 to-blue-600 hover:bg-gradient-to-l hover:from-blue-500 hover:to-indigo-600 text-gray-100 p-4 rounded-full tracking-wide font-semibold shadow-lg cursor-pointer transition ease-in duration-500">登 录</button>
+                        </div>
+                        <p class="items-center justify-center mt-10 text-center text-md text-gray-500">
+                            <span>还没有账号？</span>
+                            <a href="register.html" class="text-indigo-400 hover:text-blue-500 no-underline hover:underline cursor-pointer transition ease-in duration-300">立即注册</a>
+                        </p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+<!-- 
+       　  　▃▆█▇▄▖
+　 　 　 ▟◤▖　　　◥█▎
+   　 ◢◤　 ▐　　　 　▐▉
+　 ▗◤　　　▂　▗▖　　▕█▎
+　◤　▗▅▖◥▄　▀◣　　█▊
+▐　▕▎◥▖◣◤　　　　◢██
+█◣　◥▅█▀　　　　▐██◤
+▐█▙▂　　     　◢██◤
+◥██◣　　　　◢▄◤
+ 　　▀██▅▇▀
+
+
+114514 前端后端和网站的部署全是我一个人完成，累死辣啊啊啊啊啊啊啊！！！！
+哲学♂114514♂自由♂蕉♂原蛋白
+ -->
+ 

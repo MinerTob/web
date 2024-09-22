@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>父母性别查询器官网</title>
+    <link rel="stylesheet" href="index.css"> <!-- 引用新的 CSS 文件 -->
+    <style>
+        body {
+            position: relative; /* 为下拉菜单的定位提供参考 */
+        }
+
+        .navbar {
+            background-color: #007bff; /* 蓝色 */
+            padding: 10px; /* 添加顶部内边距 */
+            display: flex; /* 使用flex布局 */
+            align-items: center; /* 垂直居中对齐 */
+            justify-content: flex-end; /* 向右对齐 */
+        }
+
+        .nav-links {
+            display: flex; /* 使用flex布局 */
+            align-items: center; /* 垂直居中对齐 */
+            margin-right: auto; /* 将链接部分推到左边 */
+        }
+
+        .welcome-message {
+            color: white; /* 欢迎信息颜色 */
+            font-size: 1.1rem; /* 欢迎信息字体大小 */
+            margin-right: 5px; /* 和头像的间距 */
+        }
+
+        .avatar {
+            height: 40px; /* 自定义头像高度 */
+            width: 40px; /* 自定义头像宽度 */
+            border-radius: 50%; /* 圆形头像 */
+            cursor: pointer; /* 指针样式 */
+        }
+
+        .dropdown {
+            display: none; /* 初始隐藏 */
+            position: fixed; /* 固定定位 */
+            right: 10px; /* 下拉菜单右对齐 */
+            top: 60px; /* 调整为头像的下方 */
+            background-color: white;
+            border: 1px solid #ccc;
+            width: 150px; /* 设置下拉菜单的宽度 */
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); /* 添加阴影效果 */
+            z-index: 20; /* 确保下拉菜单位于最上层 */
+        }
+
+        .dropdown-menu {
+            padding: 8px;
+        }
+
+        .dropdown-menu a {
+            color: black; 
+            text-decoration: none; 
+            display: block;
+            padding: 4px 8px; 
+        }
+
+        .dropdown-menu a:hover {
+            background-color: #f0f0f0; 
+        }
+    </style>
+</head>
+<body>
+
+    <div class="navbar">
+        <div class="nav-links">
+            <a href="secondindex.html" class="second-index-btn">首页</a>
+            <a href="secondsoftware-introduction.html" class="index-btn">软件介绍</a>
+            <a href="secondusage-method.html" class="second-index-btn">使用方法</a>
+            <a class="about-link" href="https://username-github-io.onrender.com/" target="_blank">关于作者（矿工Tob）</a>
+        </div>
+
+        <!-- 欢迎信息 -->
+        <span class="welcome-message" id="welcomeMessage">欢迎您，用户！</span>
+        
+        <!-- 头像 -->
+        <img src="images/man.png" alt="Avatar" class="avatar" id="avatar">
+        <div class="dropdown" id="dropdown">
+            <div class="dropdown-menu">
+                <a href="resetPassword.html">重置密码</a>
+                <a href="login.html">切换账号</a>
+                <a href="#" id="logout">退出登录</a>
+            </div>
+        </div>
+    </div>
+
+    <h1 style="text-align: center;">欢迎来到父母性别查询器官网</h1>
+
+    <div class="image-container">
+        <img src="images/sunflower.jpg" alt="Sunflower">
+        <div class="subtitle">
+            <div>让神金，</div>
+            <div>深入人心</div>
+        </div>
+        <a href="project/Parental_Gender_Finder_Installation_Package.exe" class="software-download">
+            <img src="images/windows-icon.png" alt="Windows Icon" class="download-icon"> 
+            <span>下载 Windows 版</span>        
+        </a>        
+    </div>
+
+    <div class="footer">
+        <p>&copy; 2024 父母性别查询器</p>
+    </div>
+
+    <script>
+        // 获取存储的邮箱信息并更新欢迎信息
+        const rememberedEmail = localStorage.getItem('rememberedEmail') || '用户';
+        document.getElementById('welcomeMessage').textContent = '欢迎您，' + rememberedEmail + '！';
+
+        // 头像点击事件
+        document.getElementById('avatar').addEventListener('click', function(event) {
+            event.stopPropagation(); // 阻止事件冒泡
+            const dropdown = document.getElementById('dropdown');
+            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+        });
+
+        // 退出登录事件
+        document.getElementById('logout').addEventListener('click', function() {
+            localStorage.setItem('isLoggedIn', 'false'); // 设置登录状态为未登录
+            window.location.href = 'index.html'; // 返回首页
+        });
+
+        // 点击其他区域隐藏下拉框
+        window.onclick = function(event) {
+            if (!event.target.matches('#avatar')) {
+                const dropdown = document.getElementById("dropdown");
+                dropdown.style.display = "none";
+            }
+        }
+    </script>
+</body>
+</html>
+<!-- 
+       　  　▃▆█▇▄▖
+　 　 　 ▟◤▖　　　◥█▎
+   　 ◢◤　 ▐　　　 　▐▉
+　 ▗◤　　　▂　▗▖　　▕█▎
+　◤　▗▅▖◥▄　▀◣　　█▊
+▐　▕▎◥▖◣◤　　　　◢██
+█◣　◥▅█▀　　　　▐██◤
+▐█▙▂　　     　◢██◤
+◥██◣　　　　◢▄◤
+ 　　▀██▅▇▀
+
+
+114514 前端后端和网站的部署全是我一个人完成，累死辣啊啊啊啊啊啊啊！！！！
+哲学♂114514♂自由♂蕉♂原蛋白
+ -->
+ 
