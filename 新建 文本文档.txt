@@ -271,6 +271,7 @@ const express = require('express');
 const path = require('path');
 const fs = require('fs');
 const https = require('https');
+const http = require('http'); // 添加 http 模块
 const axios = require('axios');
 
 const app = express();
@@ -282,6 +283,17 @@ const HCAPTCHA_SECRET_KEY = 'e68091ba-9876-48f4-bd9a-56fe480810a8'; // 替换为
 // 使用内置中间件解析 JSON 请求体
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// 创建 HTTP 服务器并重定向到 HTTPS
+const httpServer = http.createServer(app);
+httpServer.listen(80, () => {
+    console.log("HTTP 服务器正在监听端口 80，并重定向到 HTTPS");
+    
+    httpServer.on('request', (req, res) => {
+        res.writeHead(301, { "Location": `https://${req.headers.host}${req.url}` });
+        res.end();
+    });
+});
 
 // 提供根目录下的 HTML 和其他静态文件
 app.use(express.static(__dirname));
@@ -455,7 +467,7 @@ const sslOptions = {
 };
 
 // 启动 HTTPS 服务器，绑定到特定 IP 地址
-const hostname = '192.168.1.61'; // 绑定到特定 IP 地址
+const hostname = '192.168.200.102'; // 绑定到特定 IP 地址
 https.createServer(sslOptions, app).listen(port, hostname, () => {
     console.log(`HTTPS 服务器正在运行，访问 https://${hostname}:${port}`);
 });
