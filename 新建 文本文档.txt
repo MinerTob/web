@@ -718,6 +718,9 @@ body {
 
     .image-container {
         padding: 20px; /* 图片容器的内边距 */
+        display: flex; /* 使用 flexbox */
+        flex-direction: column; /* 垂直排列 */
+        align-items: center; /* 水平居中 */
     }
 
     .subtitle {
@@ -757,7 +760,7 @@ body {
         font-size: 2.5vw; /* 调整后的字体大小 */
         line-height: 1.4; /* 行高 */
         margin: 10px 0; /* 上下间距 */
-        text-align: left; /* 文字从左到右换行 */
+        text-align: center; /* 文字居中对齐 */
         word-wrap: break-word; /* 自动换行 */
     }
 
@@ -768,26 +771,16 @@ body {
         text-align: center; /* 居中内容 */
     }
 
-    .introduction-title {
-        font-size: 5vw; /* 调整标题字体大小 */
-        margin: 10px 0; /* 上下间距 */
-        text-align: center; /* 标题居中 */
+    /* 确保图片位于软件介绍文字下面 */
+    .image-sidebar {
+        order: 1; /* 图片位于文字下方 */
+        margin-left: 0; /* 移除左侧空隙 */
     }
 
-    .introduction-description {
-        font-size: 2.5vw; /* 调整说明文字字体大小 */
-        line-height: 1.4; /* 行高 */
-        margin: 10px 0; /* 上下间距 */
-        width: 100%; /* 确保描述文字不会超出边缘 */
-        text-align: left; /* 文字从左到右换行 */
-        word-wrap: break-word; /* 自动换行 */
-    }
-
-    .introduction-image {
-        max-width: 25%; /* 图片最大宽度为原来的四分之一 */
+    /* 调整所有图片大小为50% */
+    img {
+        width: 100%; /* 设置图片宽度为50% */
         height: auto; /* 高度自适应 */
-        margin: 10px auto; /* 添加上下间距，并水平居中 */
-        border-radius: 4px; /* 添加圆角效果 */
     }
 
     .footer {
