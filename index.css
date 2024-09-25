@@ -1,3 +1,4 @@
+/* 原有样式 */
 body {
     font-family: 'Arial', sans-serif;
     background-color: #f7f7f7;
@@ -68,7 +69,7 @@ body {
     background-color: #f0f0f0; 
 }
 
-h1 {
+.h1 {
     font-size: 2rem;
     margin-bottom: 1rem;
 }
@@ -226,4 +227,116 @@ h1 {
 .footer p {
     margin: 0;
     color: #666; /* 版权信息颜色 */
+}
+
+/* 手机端样式 */
+@media (max-width: 768px) {
+    .navbar {
+        flex-direction: column; /* 垂直排列 */
+        align-items: flex-start; /* 左对齐 */
+    }
+
+    .navbar a {
+        padding: 10px; /* 调整内边距 */
+        width: 100%; /* 铺满全宽 */
+        text-align: center; /* 居中对齐 */
+    }
+
+    .image-container {
+        padding: 20px; /* 图片容器的内边距 */
+        display: flex; /* 使用 flexbox */
+        flex-direction: column; /* 垂直排列 */
+        align-items: center; /* 水平居中 */
+    }
+
+    .subtitle {
+        font-size: 7vw; /* 调整后的字体大小 */
+    }
+
+    .software-download {
+        display: inline-flex; /* 使按钮根据内容缩放 */
+        width: auto; /* 让宽度自适应内容 */
+        min-width: 100px; /* 设置最低宽度 */
+        height: 50px; /* 固定高度 */
+        padding: 0 12px; /* 侧边内边距 */
+        background-color: #007bff; /* 按钮背景色 */
+        color: #ffffff; /* 文字颜色 */
+        text-decoration: none; /* 移除下划线 */
+        border-radius: 32px; /* 圆角 */
+        transition: background-color 0.3s, box-shadow 0.3s; /* 过渡效果 */
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* 阴影效果 */
+        font-size: 1rem; /* 调整后的字体大小 */
+        align-items: center; /* 垂直居中 */
+        justify-content: flex-start; /* 左对齐文本和图标 */
+    }
+
+    .software-download img { /* 图标样式 */
+        width: 20px; /* 固定图标宽度 */
+        height: auto; /* 确保持比例 */
+        margin-right: 8px; /* 图标与文字之间的间距 */
+    }
+
+    .software-title {
+        font-size: 5vw; /* 调整后的字体大小 */
+        margin: 10px 0; /* 上下间距 */
+        text-align: center; /* 标题居中 */
+    }
+
+    .software-description {
+        font-size: 2.5vw; /* 调整后的字体大小 */
+        line-height: 1.4; /* 行高 */
+        margin: 10px 0; /* 上下间距 */
+        text-align: center; /* 文字居中对齐 */
+        word-wrap: break-word; /* 自动换行 */
+    }
+
+    .introduction-container {
+        max-width: 90%; /* 限制最大宽度为90% */
+        margin: 20px auto; /* 居中同时添加上下间距 */
+        padding: 10px; /* 内边距 */
+        text-align: center; /* 居中内容 */
+    }
+
+    /* 确保图片位于软件介绍文字下面 */
+    .image-sidebar {
+        order: 1; /* 图片位于文字下方 */
+        margin-left: 0; /* 移除左侧空隙 */
+    }
+
+    /* 调整所有图片大小为50% */
+    img {
+        width: 100%; /* 设置图片宽度为50% */
+        height: auto; /* 高度自适应 */
+    }
+
+    .footer {
+        background-color: #f1f1f1;
+        padding: 20px;
+        text-align: center;
+        position: fixed; /* 使用 fixed 定位 */
+        bottom: 0; /* 距离底部为0 */
+        left: 0; 
+        right: 0; /* 让脚注充满宽度 */
+        width: 100%; /* 确保 footer 宽度为100% */
+        font-size: 0.9rem; /* 调整脚注字体大小 */
+    }
+
+    .footer p {
+        margin: 0;
+        color: #666; /* 版权信息颜色 */
+    }
+
+    /* 调整头像大小 */
+    .avatar {
+        width: 35px;
+        height: 35px;
+    }
+
+    .dropdown {
+        right: 0; /* 下拉菜单右对齐 */
+    }
+
+    .download-icon {
+        width: 60px; /* 调整图标大小 */
+    }
 }
