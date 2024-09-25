@@ -94,3 +94,21 @@
         border-radius: 50%;
     }
 }
+
+/* 手机端样式 */
+@media (max-width: 768px) {
+    .circles li {
+        width: 15px; /* 调整圆圈的大小 */
+        height: 15px; /* 调整圆圈的高度 */
+    }
+
+    .circles li:nth-child(1) {
+        width: 50px; /* 调整第一个圆圈的大小 */
+        height: 50px; /* 调整第一个圆圈的高度 */
+    }
+
+    .circles li:nth-child(4) {
+        width: 30px; /* 调整第四个圆圈的大小 */
+        height: 30px; /* 调整第四个圆圈的高度 */
+    }
+}
