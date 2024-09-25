@@ -97,26 +97,34 @@ body {
     text-align: center; /* Center align text */
 }
 
+.button-container {
+    display: flex;
+    flex-direction: column; /* 按钮垂直排列 */
+    align-items: center; /* 按钮居中对齐 */
+    margin-top: 20px; /* 添加顶部间距 */
+}
+
 .software-download {
-    position: absolute;
-    top: 75%; /* 将按钮下移 */
+    position: absolute; /* 保持绝对定位 */
+    top: 60%; /* 向上移动，适应不同屏幕 */
     left: 50%; /* 水平居中 */
-    transform: translate(-50%, -50%); /* 中心对齐 */
-    padding: 12px 0; /* 垂直内边距 */
+    transform: translate(-50%, -50%); /* 垂直居中对齐 */
+    padding: 8px 16px; /* 减少按钮内边距 */
     background-color: #007bff; /* 按钮背景色 */
     color: #ffffff; /* 文字颜色 */
     text-decoration: none; /* 移除下划线 */
     border-radius: 32px; /* 圆角 */
-    transition: background-color 0.3s, box-shadow 0.3s; /* 过渡效果 */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* 阴影效果 */
-    font-size: 1.2rem; /* 字体大小 */
+    transition: background-color 0.3s; /* 悬停过渡 */
+    width: 280px; /* 调整宽度，保持适中 */
     display: flex; /* 使用 flexbox 对齐 */
     align-items: center; /* 垂直居中 */
     justify-content: center; /* 水平居中对齐文本和图标 */
-    width: 350px; /* 设置按钮宽度 */
-    text-align: center; /* 水平居中对齐文本 */
-    line-height: 36px; /* 行高 */
-    box-sizing: border-box; /* 包括内边距在宽度和高度内 */
+    margin: 20px 0; /* 增加按钮上下间距 */
+    height: 50px; /* 固定高度 */
+}
+
+.software-download:nth-child(2) {
+    top: 75%; /* 调整第二个按钮位置，适应不同屏幕 */
 }
 
 .software-download:hover {
@@ -124,9 +132,9 @@ body {
 }
 
 .download-icon {
-    width: 80px; /* 图标宽度 */
-    height: auto; /* 高度自适应 */
-    margin-right: 8px; /* 图标与文本之间的间距 */
+    width: 30px; /* 图标大小 */
+    height: auto; /* 自适应高度 */
+    margin-right: 8px; /* 图标与文字之间的间距 */
 }
 
 /* 内容区域整体布局 */
@@ -255,19 +263,23 @@ body {
 
     .software-download {
         display: inline-flex; /* 使按钮根据内容缩放 */
-        width: auto; /* 让宽度自适应内容 */
-        min-width: 100px; /* 设置最低宽度 */
-        height: 50px; /* 固定高度 */
-        padding: 0 12px; /* 侧边内边距 */
+        width: 200px; /* 设定固定宽度 */
+        height: 35px; /* 调整高度为35px */
+        padding: 0 8px; /* 较小的侧边内边距 */
         background-color: #007bff; /* 按钮背景色 */
         color: #ffffff; /* 文字颜色 */
         text-decoration: none; /* 移除下划线 */
-        border-radius: 32px; /* 圆角 */
+        border-radius: 20px; /* 圆角 */
         transition: background-color 0.3s, box-shadow 0.3s; /* 过渡效果 */
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* 阴影效果 */
-        font-size: 1rem; /* 调整后的字体大小 */
+        font-size: 0.9rem; /* 调整后的字体大小 */
         align-items: center; /* 垂直居中 */
-        justify-content: flex-start; /* 左对齐文本和图标 */
+        justify-content: center; /* 居中对齐文本和图标 */
+        margin: 5px 0; /* 增加按钮上下间距 */
+    }
+
+    .software-download:nth-child(2) {
+        top:75%; /* 调整第二个按钮位置，适应不同屏幕 */
     }
 
     .software-download img { /* 图标样式 */
