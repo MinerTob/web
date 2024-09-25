@@ -24,10 +24,16 @@
             <div>让神金，</div>
             <div>深入人心</div>
         </div>
-        <a href="#" class="software-download" id="downloadBtn">
-            <img src="images/windows-icon.png" alt="Windows Icon" class="download-icon"> 
-            <span>下载 Windows 版</span>        
-        </a>        
+        <div class="button-container">
+            <a href="#" class="software-download" id="downloadBtn">
+                <img src="images/windows-icon.png" alt="Windows Icon" class="download-icon"> 
+                <span>下载 Windows 版</span>        
+            </a>        
+            <a href="#" class="software-download" id="downloadOtherBtn" style="background-color: green;">
+                <img src="images/windows-icon.png" alt="Windows Icon" class="download-icon"> 
+                <span>父母性别查询器网页版</span>        
+            </a>
+        </div>
     </div>
 
     <div class="footer">
@@ -37,8 +43,20 @@
     <script>
         document.getElementById('downloadBtn').addEventListener('click', function(event) {
             const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+            if (!isLoggedIn) {
                 alert("请先登录或注册您的账号。");
                 window.location.href = "login.html"; // 跳转到登录页面
+            }
+        });
+
+        document.getElementById('downloadOtherBtn').addEventListener('click', function(event) {
+            const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+            if (!isLoggedIn) {
+                alert("请先登录或注册您的账号。");
+                window.location.href = "login.html"; // 跳转到登录页面
+            } else {
+                window.location.href = "https://www.74cf.com:8443"; //跳转到另一个网站
+            }
         });
     </script>
 </body>
