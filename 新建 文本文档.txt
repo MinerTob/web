@@ -571,26 +571,34 @@ body {
     text-align: center; /* Center align text */
 }
 
+.button-container {
+    display: flex;
+    flex-direction: column; /* 按钮垂直排列 */
+    align-items: center; /* 按钮居中对齐 */
+    margin-top: 20px; /* 添加顶部间距 */
+}
+
 .software-download {
-    position: absolute;
-    top: 75%; /* 将按钮下移 */
+    position: absolute; /* 保持绝对定位 */
+    top: 60%; /* 向上移动，适应不同屏幕 */
     left: 50%; /* 水平居中 */
-    transform: translate(-50%, -50%); /* 中心对齐 */
-    padding: 12px 0; /* 垂直内边距 */
+    transform: translate(-50%, -50%); /* 垂直居中对齐 */
+    padding: 8px 16px; /* 减少按钮内边距 */
     background-color: #007bff; /* 按钮背景色 */
     color: #ffffff; /* 文字颜色 */
     text-decoration: none; /* 移除下划线 */
     border-radius: 32px; /* 圆角 */
-    transition: background-color 0.3s, box-shadow 0.3s; /* 过渡效果 */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* 阴影效果 */
-    font-size: 1.2rem; /* 字体大小 */
+    transition: background-color 0.3s; /* 悬停过渡 */
+    width: 280px; /* 调整宽度，保持适中 */
     display: flex; /* 使用 flexbox 对齐 */
     align-items: center; /* 垂直居中 */
     justify-content: center; /* 水平居中对齐文本和图标 */
-    width: 350px; /* 设置按钮宽度 */
-    text-align: center; /* 水平居中对齐文本 */
-    line-height: 36px; /* 行高 */
-    box-sizing: border-box; /* 包括内边距在宽度和高度内 */
+    margin: 20px 0; /* 增加按钮上下间距 */
+    height: 50px; /* 固定高度 */
+}
+
+.software-download:nth-child(2) {
+    top: 75%; /* 调整第二个按钮位置，适应不同屏幕 */
 }
 
 .software-download:hover {
@@ -598,9 +606,9 @@ body {
 }
 
 .download-icon {
-    width: 80px; /* 图标宽度 */
-    height: auto; /* 高度自适应 */
-    margin-right: 8px; /* 图标与文本之间的间距 */
+    width: 30px; /* 图标大小 */
+    height: auto; /* 自适应高度 */
+    margin-right: 8px; /* 图标与文字之间的间距 */
 }
 
 /* 内容区域整体布局 */
@@ -729,19 +737,23 @@ body {
 
     .software-download {
         display: inline-flex; /* 使按钮根据内容缩放 */
-        width: auto; /* 让宽度自适应内容 */
-        min-width: 100px; /* 设置最低宽度 */
-        height: 50px; /* 固定高度 */
-        padding: 0 12px; /* 侧边内边距 */
+        width: 200px; /* 设定固定宽度 */
+        height: 35px; /* 调整高度为35px */
+        padding: 0 8px; /* 较小的侧边内边距 */
         background-color: #007bff; /* 按钮背景色 */
         color: #ffffff; /* 文字颜色 */
         text-decoration: none; /* 移除下划线 */
-        border-radius: 32px; /* 圆角 */
+        border-radius: 20px; /* 圆角 */
         transition: background-color 0.3s, box-shadow 0.3s; /* 过渡效果 */
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* 阴影效果 */
-        font-size: 1rem; /* 调整后的字体大小 */
+        font-size: 0.9rem; /* 调整后的字体大小 */
         align-items: center; /* 垂直居中 */
-        justify-content: flex-start; /* 左对齐文本和图标 */
+        justify-content: center; /* 居中对齐文本和图标 */
+        margin: 5px 0; /* 增加按钮上下间距 */
+    }
+
+    .software-download:nth-child(2) {
+        top:75%; /* 调整第二个按钮位置，适应不同屏幕 */
     }
 
     .software-download img { /* 图标样式 */
@@ -956,10 +968,16 @@ index.html:
             <div>让神金，</div>
             <div>深入人心</div>
         </div>
-        <a href="#" class="software-download" id="downloadBtn">
-            <img src="images/windows-icon.png" alt="Windows Icon" class="download-icon"> 
-            <span>下载 Windows 版</span>        
-        </a>        
+        <div class="button-container">
+            <a href="#" class="software-download" id="downloadBtn">
+                <img src="images/windows-icon.png" alt="Windows Icon" class="download-icon"> 
+                <span>下载 Windows 版</span>        
+            </a>        
+            <a href="#" class="software-download" id="downloadOtherBtn" style="background-color: green;">
+                <img src="images/windows-icon.png" alt="Windows Icon" class="download-icon"> 
+                <span>父母性别查询器网页版</span>        
+            </a>
+        </div>
     </div>
 
     <div class="footer">
@@ -969,8 +987,20 @@ index.html:
     <script>
         document.getElementById('downloadBtn').addEventListener('click', function(event) {
             const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+            if (!isLoggedIn) {
                 alert("请先登录或注册您的账号。");
                 window.location.href = "login.html"; // 跳转到登录页面
+            }
+        });
+
+        document.getElementById('downloadOtherBtn').addEventListener('click', function(event) {
+            const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+            if (!isLoggedIn) {
+                alert("请先登录或注册您的账号。");
+                window.location.href = "login.html"; // 跳转到登录页面
+            } else {
+                window.location.href = "https://www.74cf.com:8443"; //跳转到另一个网站
+            }
         });
     </script>
 </body>
@@ -991,7 +1021,151 @@ index.html:
 114514 前端后端和网站的部署全是我一个人完成，累死辣啊啊啊啊啊啊啊！！！！
 哲学♂114514♂自由♂蕉♂原蛋白
  -->
- login.html:
+software-introduction.html:
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>软件介绍 - 父母性别查询器</title>
+    <link rel="stylesheet" href="index.css">
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh; /* 让页面高度至少为视口高度 */
+        }
+
+        .content-container {
+            flex: 1; /* 占据可用空间 */
+        }
+
+        .footer {
+            background-color: #f1f1f1; /* 背景颜色 */
+            padding: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="navbar">
+        <a href="login.html" class="login-btn">登录/注册</a>
+        <a href="index.html" class="index-btn">首页</a>
+        <a href="software-introduction.html" class="index-btn">软件介绍</a>
+        <a href="usage-method.html" class="index-btn">使用方法</a>
+        <a class="about-link" href="https://username-github-io.onrender.com/" target="_blank">关于作者（矿工Tob）</a>
+    </div>
+
+    <div class="content-container">
+        <div class="introduction-container">
+            <h2 class="software-title">软件介绍</h2>
+            <p class="software-description">父母性别查询器是一款由矿工Tob独立开发的神金软件，您可以轻松查询您父母的性别（虽然并没有什么实际意义）。父母性别查询器支持多种语言（目前有九种），让世界各地的欢愉信徒能够轻松使用。</p>
+        </div>
+
+        <div class="image-sidebar">
+            <img src="images/fmxbcxq.png" alt="Image Description" class="sidebar-image">
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>&copy; 2024 父母性别查询器</p>
+    </div>
+
+</body>
+</html>
+<!-- 
+       　  　▃▆█▇▄▖
+　 　 　 ▟◤▖　　　◥█▎
+   　 ◢◤　 ▐　　　 　▐▉
+　 ▗◤　　　▂　▗▖　　▕█▎
+　◤　▗▅▖◥▄　▀◣　　█▊
+▐　▕▎◥▖◣◤　　　　◢██
+█◣　◥▅█▀　　　　▐██◤
+▐█▙▂　　     　◢██◤
+◥██◣　　　　◢▄◤
+ 　　▀██▅▇▀
+
+
+114514 前端后端和网站的部署全是我一个人完成，累死辣啊啊啊啊啊啊啊！！！！
+哲学♂114514♂自由♂蕉♂原蛋白
+ -->
+usage-method.html:
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>使用方法 - 父母性别查询器</title>
+    <link rel="stylesheet" href="index.css">
+    
+</head>
+<body>
+
+    <div class="navbar">
+        <a href="login.html" class="login-btn">登录/注册</a>
+        <a href="index.html" class="index-btn">首页</a>
+        <a href="software-introduction.html" class="index-btn">软件介绍</a>
+        <a href="usage-method.html" class="index-btn">使用方法</a>
+        <a class="about-link" href="https://username-github-io.onrender.com/" target="_blank">关于作者（矿工Tob）</a>
+    </div>
+
+    <div class="tutorial-container">
+        <h2 class="software-title">使用教程</h2>
+        <ul class="tutorial-list">
+            <li>1. 首先，在官网中点击下载此软件
+                <img src="images/first.png" alt="下载软件" class="tutorial-image first-image" />
+            </li>
+            <li>2. 等待下载完成，点击打开文件
+                <img src="images/second.png" alt="下载软件" class="tutorial-image" />
+            </li>
+            <li>3. 选择你的安装语言，点击安装
+                <img src="images/third.png" alt="下载软件" class="tutorial-image" />
+            </li>
+            <li>4. 选择你的安装路径，最好放在内存最多的的盘（强烈不建议放在C盘）
+                <img src="images/fourth.png" alt="下载软件" class="tutorial-image" />
+            </li>
+            <li>5. 点击创建桌面快捷方式，然后点击下一步
+                <img src="images/fifth.png" alt="下载软件" class="tutorial-image" />
+            </li>
+            <li>6. 确认安装路径无误后，点击安装
+                <img src="images/sixth.png" alt="下载软件" class="tutorial-image" />
+            </li>
+            <li>7. 等待安装完毕，先注册一个账号（可以乱填）
+                <img src="images/seventh.png" alt="下载软件" class="tutorial-image" />
+            </li>
+            <li>8. 注册成功后，回到登录页面，点击倒三角选择您注册的账号（最好点击记住密码），然后点击登录
+                <img src="images/eighth.png" alt="下载软件" class="tutorial-image" />
+            </li>
+            <li>9. 这样，您就可以开始使用软件了，可以选择您的语言进行查询
+                <img src="images/fmxbcxq.png" alt="下载软件" class="tutorial-image" />
+            </li>
+        </ul>
+    </div>
+
+    <div class="footer">
+        <p>&copy; 2024 父母性别查询器</p>
+    </div>
+
+</body>
+</html>
+<!-- 
+       　  　▃▆█▇▄▖
+　 　 　 ▟◤▖　　　◥█▎
+   　 ◢◤　 ▐　　　 　▐▉
+　 ▗◤　　　▂　▗▖　　▕█▎
+　◤　▗▅▖◥▄　▀◣　　█▊
+▐　▕▎◥▖◣◤　　　　◢██
+█◣　◥▅█▀　　　　▐██◤
+▐█▙▂　　     　◢██◤
+◥██◣　　　　◢▄◤
+ 　　▀██▅▇▀
+
+
+114514 前端后端和网站的部署全是我一个人完成，累死辣啊啊啊啊啊啊啊！！！！
+哲学♂114514♂自由♂蕉♂原蛋白
+ -->
+login.html:
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -1070,7 +1244,7 @@ index.html:
 114514 前端后端和网站的部署全是我一个人完成，累死辣啊啊啊啊啊啊啊！！！！
 哲学♂114514♂自由♂蕉♂原蛋白
  -->
- register.html:
+register.html:
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -1145,7 +1319,7 @@ index.html:
 114514 前端后端和网站的部署全是我一个人完成，累死辣啊啊啊啊啊啊啊！！！！
 哲学♂114514♂自由♂蕉♂原蛋白
  -->
- resetPassword.html:
+resetPassword.html:
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -1217,7 +1391,7 @@ index.html:
 114514 前端后端和网站的部署全是我一个人完成，累死辣啊啊啊啊啊啊啊！！！！
 哲学♂114514♂自由♂蕉♂原蛋白
  -->
- secondindex.html:
+secondindex.html:
 <!DOCTYPE html>
 <html lang="zh">
 <head>
@@ -1317,10 +1491,16 @@ index.html:
             <div>让神金，</div>
             <div>深入人心</div>
         </div>
-        <a href="project/Parental_Gender_Finder_Installation_Package.exe" class="software-download">
-            <img src="images/windows-icon.png" alt="Windows Icon" class="download-icon"> 
-            <span>下载 Windows 版</span>        
-        </a>        
+        <div class="button-container">
+            <a href="project/Parental_Gender_Finder_Installation_Package.exe" class="software-download" id="downloadBtn">
+                <img src="images/windows-icon.png" alt="Windows Icon" class="download-icon"> 
+                <span>下载 Windows 版</span>        
+            </a>        
+            <a href="https://www.74cf.com:8443" class="software-download" id="downloadOtherBtn" style="background-color: green;" target="_blank">
+                <img src="images/windows-icon.png" alt="Windows Icon" class="download-icon"> 
+                <span>父母性别查询器网页版</span>        
+            </a>
+        </div>
     </div>
 
     <div class="footer">
@@ -1371,7 +1551,7 @@ index.html:
 114514 前端后端和网站的部署全是我一个人完成，累死辣啊啊啊啊啊啊啊！！！！
 哲学♂114514♂自由♂蕉♂原蛋白
  -->
- secondsoftware-introduction.html:
+secondsoftware-introduction.html:
 <!DOCTYPE html>
 <html lang="zh">
 <head>
@@ -1537,7 +1717,7 @@ index.html:
 114514 前端后端和网站的部署全是我一个人完成，累死辣啊啊啊啊啊啊啊！！！！
 哲学♂114514♂自由♂蕉♂原蛋白
  -->
- secondusage-method.html:
+secondusage-method.html:
 <!DOCTYPE html>
 <html lang="zh">
 <head>
@@ -1707,7 +1887,7 @@ index.html:
 114514 前端后端和网站的部署全是我一个人完成，累死辣啊啊啊啊啊啊啊！！！！
 哲学♂114514♂自由♂蕉♂原蛋白
  -->
- software-introduction.html:
+software-introduction.html:
 <!DOCTYPE html>
 <html lang="zh">
 <head>
