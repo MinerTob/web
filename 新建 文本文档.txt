@@ -698,12 +698,16 @@ body {
 
 /* 新增版权信息部分样式 */
 .footer {
-    background-color: #f1f1f1;
+    background-color: #f1f1f1; /* 背景颜色 */
     padding: 20px;
-    text-align: center;
-    position: relative;
-    bottom: 0;
-    width: 100%;
+    text-align: center; /* 确保文本居中 */
+    position: fixed; /* 使用 fixed 定位 */
+    bottom: 0; /* 距离底部为0 */
+    left: 0;
+    right: 0; /* 让脚注充满宽度 */
+    width: 100%; /* 确保 footer 宽度为100% */
+    font-size: 0.9rem; /* 调整脚注字体大小 */
+    margin-left: -16px; /* 根据情况调整负值以居中 */
 }
 
 .footer p {
